@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 # Импортируем настройки базы данных из файла settings.py
 from settings import DATABASES
-# Импортируем модель Users из файла database/models.py
+# Импортируем модель InfoUsers из файла database/models.py
 from database.models import InfoUsers
 
 
@@ -16,7 +16,7 @@ class Connectbase:
         """Формируем строку подключения к базе данных"""
         self.path = (f"{self.data_bd['NAME']}://{self.data_bd['USER']}:{self.data_bd['PASSWORD']}@"
                      f"{self.data_bd['HOST']}:{self.data_bd['PORT']}/{self.data_bd['BD_NAME']}")
-        """Распаковываем информацию о пользавтеле"""
+        """Распаковываем информацию о пользователе"""
         self.id_user = args[0]
         self.name = args[1]
         self.age = args[2]
