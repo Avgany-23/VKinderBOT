@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base, Mapped, relationship
-from sqlalchemy import Column, Integer, BigInteger, Sequence, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, Sequence, ForeignKey, String
 
 basic = declarative_base()
 
@@ -20,9 +20,14 @@ class InfoUsers(basic):
     """Модель с информацией о пользователях"""
     __tablename__ = 'infousers'
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(Integer, primary_key=True)
     id_user = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'), unique=True)
-
+    name = Column(String(length=250))
+    age = Column(Integer)
+    gender = Column(String(length=250))
+    marital_status = Column(String(length=250))
+    city = Column(String(length=250))
+    interests = Column(String(length=250))
     users: Mapped['Users'] = relationship(back_populates='infouser', uselist=False)
 
 
