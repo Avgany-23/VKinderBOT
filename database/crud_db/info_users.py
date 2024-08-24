@@ -46,7 +46,7 @@ class InfoUsersBd(Session):
                 if user is not None:
                     return user
                 else:
-                    return -10  # Пользователь с таким id не найден
+                    return -1  # Пользователь с таким id не найден
         except Exception as e:
-            return -12
+            return -1
 
