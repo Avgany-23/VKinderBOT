@@ -4,7 +4,6 @@ from database import Session
 
 class BlackListBD(Session):
     table = BlackList
-    """Конструктор класса принимает аргументы данные пользователя VK"""
 
-    def likedlist(self):
+    def BlackListBD(self):
         pass
