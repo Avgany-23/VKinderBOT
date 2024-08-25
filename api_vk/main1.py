@@ -11,6 +11,8 @@ config.add_section('VK')
 config.read('config.ini')
 access_token = config.get('VK', 'key')
 token_2 = config.get('VK', 'user_access_key')
+
+
 class VK:
     def __init__(self, access_token, user_id, token_2, version='5.199', id_app='51927413'):
         self.token = access_token
