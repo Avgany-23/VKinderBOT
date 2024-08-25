@@ -21,6 +21,7 @@ class VK:
         self.id_app = id_app
         self.token_2 = token_2
 
+
     def users_info(self):
         url = 'https://api.vk.com/method/users.get'
         params = {'user_ids': self.id,
@@ -326,8 +327,8 @@ vk = VK(access_token, user_id, token_2)
 # pprint(vk.get_photos_from_profile()) #оба
 # pprint(vk.get_photos_from_wall()) #оба
 # pprint(vk.calculate_age('25.12.1990')) #оба
-# pprint(vk.formatting_sex(2)) #оба
-# # pprint(vk.formatting_marital_status()) #в словари все правильно передает
+# pprint(vk.formatting_sex(1)) #оба
+# pprint(vk.formatting_marital_status(1)) #в словари все правильно передает
 # pprint(vk.formatting_users_info_and_photos_with_likes())
 # pprint(vk.generate_auth_url('51927413')) #оба
 # pprint(vk.find_users_woman()) #оба
