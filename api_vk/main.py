@@ -12,6 +12,10 @@ config.read('config.ini')
 access_token = config.get('VK', 'key')
 token_2 = config.get('VK', 'user_access_key')
 
+
+
+
+
 class VK:
   def __init__(self, access_token, user_id, token_2, version='5.199', id_app='51927413'):
       self.token = access_token
@@ -336,10 +340,3 @@ vk = VK(access_token, user_id, token_2)
 # pprint(vk.find_users_men()) #оба
 # pprint(vk.formatting_find_users_woman())
 # pprint(vk.formatting_find_users_men())
-
-
-
-
-
-
-
