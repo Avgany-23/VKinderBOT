@@ -1,3 +1,4 @@
+from sqlalchemy.exc import SQLAlchemyError
 from database.models import InfoUsers
 from database import Session
 
@@ -27,7 +28,7 @@ class InfoUsersBd(Session):
                 """Фиксируем изменения в базе данных"""
                 sess.commit()
                 return 1
-        except Exception as e:
+        except SQLAlchemyError as e:
         # информация об ошибке е не передаю
             return -1
 
@@ -47,6 +48,5 @@ class InfoUsersBd(Session):
                     return user
                 else:
                     return -1  # Пользователь с таким id не найден
-        except Exception as e:
+        except SQLAlchemyError as e:
             return -1
-

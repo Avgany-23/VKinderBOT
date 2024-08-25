@@ -1,11 +1,15 @@
 from unittest import TestCase
 from users import UsersBd
 from info_users import InfoUsersBd
+from liked_list import LikedListBb
+from black_list import BlackListBd
 """Тестирование создание пользователя"""
 
-# Создаем экземпляр класса UsersBd
+# Создаем экземпляры классов
 users_bd = UsersBd()
 info_users_bd = InfoUsersBd()
+liked_list_bd = LikedListBb()
+black_list_bd = BlackListBd()
 #Test_add_dell_user
 id_vk = 1000001
 old_id = 1000000
@@ -19,6 +23,12 @@ gender = "мужской"
 marital_status = "активный поиск"
 city = "Москва"
 interests = "Музыка"
+#Test_liked_list
+id_user = 1234537
+id_like_user = 999
+#Test_black_list
+id_user = 1234537
+id_ignore_user = 888
 
 class Test_users_operations(TestCase):
     def test_add_user(self):
@@ -66,10 +76,75 @@ class Test_users_operations(TestCase):
 
 class Test_info_users(TestCase):
     def test_info_users(self):
-        """Тест проверяет работу функции info_users"""
+        """Тест проверяет работу функции info_users
+        Функция загружает информацию о пользователе"""
         result = info_users_bd.info_users(id_user, name, age, gender, marital_status, city, interests)
         # Успешная загрузка информации == 1
         expected = 1
         self.assertEqual(expected, result, 'Результат теста: Информация о пользователе не загружена.')
 
 
+class Test_liked_list(TestCase):
+
+    def test_add_like_user(self):
+        """Тест проверяет работу функции add_like_user
+        Функция добавляет ID пользователя в Like"""
+        result = liked_list_bd.add_like_user(id_user, id_like_user)
+        # Успешная загрузка информации == 1
+        expected = 1
+        self.assertEqual(expected, result, 'Результат теста: Информация о пользователе не загружена.')
+
+
+    def test_get_like_user(self):
+        """Тест проверяет работу функции get_like_user
+        функция получает информацию о наличии ID в Like"""
+        result = liked_list_bd.get_like_user(id_user, id_like_user)
+        # Успешная загрузка информации == 1
+        expected = id_like_user
+        self.assertEqual(expected, result[1], 'Результат теста: Информация о пользователе не получена.')
+
+
+class Test_liked_list2(TestCase):
+    def test_dell_like_user(self):
+        """Тест проверяет работу функцию dell_like_user
+        удаляет ранее созданной связки ID пользователя + ID понравившегося пользователя"""
+
+        result = liked_list_bd.dell_like_user(id_user, id_like_user)
+        # Успешная загрузка информации == 1
+        expected = 1
+        self.assertEqual(expected, result, 'Результат теста: Информация о пользователе не Удалена.')
+
+
+class Test_black_list(TestCase):
+    def test_add_black_list(self):
+        """Тест проверяет работу функцию add_black_list
+        Функция добавляет пользователю в black list ID блокируемого пользователя"""
+        result = black_list_bd.add_black_list(id_user, id_ignore_user)
+        # Успешная операция == 1
+        expected = 1
+        self.assertEqual(expected, result, 'Результат теста: Информация о пользователе не загружена.')
+
+
+    def test_get_black_list(self):
+        """Тест проверяет работу функции get_like_user
+        получить информацию о наличии блокировки по ID"""
+        result = black_list_bd.get_black_list(id_user, id_ignore_user)
+        # Успешная загрузка информации == 1
+        expected = id_ignore_user
+
+        self.assertEqual(expected, result[1], 'Результат теста: Информация о пользователе не получена.')
+
+
+class Test_black_list2(TestCase):
+    def test_dell_black_list(self):
+        """Тест проверяет работу функцию dell_black_list
+        Функция удаляет из списка пользователя конкретный ID"""
+        result = black_list_bd.dell_black_list(id_user, id_ignore_user)
+        # Успешная операция
+        expected = 1
+        # Обработка return с ошибкой.
+        if result == 1:
+            self.assertEqual(expected, result)
+        else:
+            #Ошибка лежит в result[1]
+            self.assertEqual(expected, result[0], 'Результат теста: Информация о пользователе не Удалена.')

@@ -1,3 +1,4 @@
+from sqlalchemy.exc import SQLAlchemyError
 from database.models import Users
 from database import Session
 from info_users import InfoUsersBd
@@ -20,7 +21,7 @@ class UsersBd(Session):
                 sess.delete(user)
                 sess.commit()
                 return 1
-        except Exception as e:
+        except SQLAlchemyError as e:
             # информация об ошибке е не передаю
             return -1
 
@@ -36,7 +37,7 @@ class UsersBd(Session):
                     return 1
                 else:
                     return -1
-        except Exception as e:
+        except SQLAlchemyError as e:
             # Информация об ошибке e не передается
             return -1
 
@@ -49,6 +50,6 @@ class UsersBd(Session):
                 sess.add(self.table(id_vk=id_vk))
                 sess.commit()
                 return 1
-        except Exception as e:
+        except SQLAlchemyError as e:
             # информация об ошибке е не передаю
-            return -1
+            return -1, e
