@@ -1,16 +1,14 @@
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_bot.menu_button import *
 from vk_bot.bot_function import *
-from dotenv import load_dotenv
-import os
+from settings import TOKEN_BOT, GROUP_ID_VK
 import json
 import re
 
 
-load_dotenv()
-vk = vk_api.VkApi(token=os.getenv('token_bot'))
+vk = vk_api.VkApi(token=TOKEN_BOT)
 vk_ = vk.get_api()
-long_poll = VkBotLongPoll(vk, int(os.getenv('group_id')))
+long_poll = VkBotLongPoll(vk, GROUP_ID_VK)
 
 
 for event in long_poll.listen():
@@ -24,7 +22,8 @@ for event in long_poll.listen():
             if pay_load_type == 'search_people':
                 send_message(vk, id_user,
                              message='кар',
-                             template=get_template_carousel(vk, ['vk_bot/media/test_photo.png']))
+                             template=get_template_carousel(vk, ['vk_bot/media/test_photo.png']),
+                             )
             elif pay_load_type in ('Like list', 'Block list'):
                 send_message(vk, id_user, list_users(15, request))
             elif pay_load_type == 'browsing_history':

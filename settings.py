@@ -1,4 +1,12 @@
 # Для общих настроек проекта.
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+TOKEN_BOT = os.getenv('token_bot')
+GROUP_ID_VK = int(os.getenv('group_id'))
+VK_KEY_API = None
 
 DATABASES = {
     'postgresql': {
@@ -10,3 +18,4 @@ DATABASES = {
         'BD_NAME': 'vk',
     }
 }
+
