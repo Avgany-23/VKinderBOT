@@ -1,6 +1,5 @@
 import requests
-api_token = 'vk1.a.kJuuK4TCFYrrjuXtaDOOW-swUEM9DHOcoCZhNIb6fkYry8gcO-dvi2ksFoW0kjHhKQXmxSmk38KZOljZooGyio4MHrIGqbYVeQvidb4q8OHQV8FTZhe76xMz6-oSbYrr2yXee1RN73sEJn6oLYhcQlCCg6Yvc-MJrBp-53_1VYk0167x53hvwFsNjum3wHvtSoO_mPKcJHF2CkSuk-R0iA'
-
+api_token = ''
 
 class SearchVK:
     def __init__(self, token_api_vk, version='5.199'):
