@@ -1,54 +1,58 @@
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_bot.menu_button import *
 from vk_bot.bot_function import *
+from vk_bot.utils import decorator_check_users_or_create_him
 from settings import TOKEN_BOT, GROUP_ID_VK
 import json
 import re
 
 
-vk = vk_api.VkApi(token=TOKEN_BOT)
+vk = VkApi(token=TOKEN_BOT)
 vk_ = vk.get_api()
 long_poll = VkBotLongPoll(vk, GROUP_ID_VK)
 
 
 for event in long_poll.listen():
-    if event.type == VkBotEventType.MESSAGE_NEW:        # Событие на получение сообщения
+    if event.type == VkBotEventType.MESSAGE_NEW:                                # Событие на получение сообщения
         if event.from_user:
             message = event.obj.message
             id_user = event.obj.message['from_id']
             request = message['text'].lower()
             pay_load_type = json.loads(message['payload'])['type'] if 'payload' in message else ''
 
-            if pay_load_type == 'search_people':
+            if pay_load_type == 'search_people':                                # Кнопка "Найти половинку"
                 send_message(vk, id_user,
                              message='кар',
-                             template=get_template_carousel(vk, ['vk_bot/media/test_photo.png']),
-                             )
-            elif pay_load_type in ('Like list', 'Block list'):
-                send_message(vk, id_user, list_users(15, request))
-            elif pay_load_type == 'browsing_history':
+                             template=(decorator_check_users_or_create_him(id_user)
+                                                (get_template_carousel)
+                                                (vk, ['vk_bot/media/test_photo.png'])))
+            elif pay_load_type in ('Like list', 'Block list'):                  # Кнопка "Найти половинку"
+                send_message(vk, id_user, list_users(id_user, count=15, list_user=request))
+            elif pay_load_type == 'browsing_history':                           # Кнопка "История просмотров"
                 send_message(vk, id_user, browsing_history(15))
-            elif pay_load_type == 'filters':
-                send_message(vk, id_user, user_filters(id_user), filters_menu())
-            elif re.findall(r'(\d{2}-\d{2})|>35', pay_load_type):
-                send_message(vk, id_user, 'Возраст установлен')
-            elif pay_load_type in ('sex-male', 'sex-female'):
-                send_message(vk, id_user, 'Пол установлен')
-            elif request == "меню":
-                send_message(vk, id_user, 'Главное меню', main_menu())
-            else:
+            elif pay_load_type == 'filters':                                    # Кнопка "Фильтры поиска людей"
+                decorator_check_users_or_create_him(id_user)(send_message)(vk=vk,
+                                                                           user_id=id_user,
+                                                                           message=user_filters(id_user),
+                                                                           keyboard=filters_menu())
+            elif (re.findall(r'(\d{2}-\d{2})|>35', pay_load_type) or
+                  re.findall(r'Установить возраст:?[ ]?\d{1,}[- ]\d{1,}', request, re.IGNORECASE)):  # Обнова age
+                change_filter_age(id_user, request), send_message(vk, id_user, 'Возраст установлен')
+            elif pay_load_type in ('sex-male', 'sex-female'):                   # Inline кнопка установки пола
+                change_filter_sex(id_user, request), send_message(vk, id_user, 'Пол установлен')
+            elif request == "меню":                                             # Сообщение "Меню" - пока что её нет
+                send_message(vk, id_user, 'Главное меню', main_menu(id_user))
+            else:                                                               # Остальные сообщения
                 send_message(vk, id_user, 'Чее ??')
 
     if event.type == VkBotEventType.MESSAGE_EVENT:      # Событие на нажатие кнопки
         callback = event.object.payload.get('type')     # действие callback
         id_user = event.object.user_id                  # id пользователя
 
-        if callback == 'search_people':
-            print('search_people')
-        if callback == 'show_snackbar':
+        if callback == 'show_snackbar':                 # Кнопка "Ваши отметки"
             snow_snackbar(vk, event.object.event_id, id_user, event.object.peer_id, json.dumps(event.object.payload))
         if callback == 'main_menu':
-            send_message(vk, id_user, 'Главное меню', main_menu())
+            send_message(vk, id_user, 'Главное меню', main_menu(id_user))
 
 
 

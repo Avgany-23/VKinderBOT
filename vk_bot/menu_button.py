@@ -1,7 +1,8 @@
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_bot.bot_function import marks_person
 
 
-def main_menu() -> VkKeyboard:
+def main_menu(id_vk) -> VkKeyboard:
     """Inline клавиатура главного меню"""
     keyboard = VkKeyboard(one_time=False)
     keyboard.add_button('Найти половинку 💙',
@@ -24,7 +25,8 @@ def main_menu() -> VkKeyboard:
                         payload={"type": "browsing_history"})
     keyboard.add_callback_button('Ваши отметки',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "show_snackbar", "text": "Вас отметило 0 человек, вы никому не нужны"})
+                                 payload={"type": "show_snackbar",
+                                          "text": f"Вас отметило {marks_person(id_vk)}, вы никому не нужны"})
 
     return keyboard
 
@@ -64,17 +66,17 @@ def filters_menu() -> VkKeyboard:
     return keyboard
 
 
-def like_or_block_menu() -> VkKeyboard:
-    """Список отмеченных/заблокированных пользователей"""
-    keyboard = VkKeyboard(one_time=False, inline=True)
-    keyboard.add_callback_button('Тут будут фильтры',
-                                 color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "search_people"})
-    keyboard.add_line()
-    keyboard.add_button('Вернуться назад',
-                                 color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "main_menu"})
-    return keyboard
+# def like_or_block_menu() -> VkKeyboard:
+#     """Список отмеченных/заблокированных пользователей"""
+#     keyboard = VkKeyboard(one_time=False, inline=True)
+#     keyboard.add_callback_button('Тут будут фильтры',
+#                                  color=VkKeyboardColor.SECONDARY,
+#                                  payload={"type": "search_people"})
+#     keyboard.add_line()
+#     keyboard.add_button('Вернуться назад',
+#                                  color=VkKeyboardColor.SECONDARY,
+#                                  payload={"type": "main_menu"})
+#     return keyboard
 
 
 def search_menu():

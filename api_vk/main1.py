@@ -54,22 +54,13 @@ class VK:
         return response.json()
 
     def calculate_age(self, date_):
-        self.date_ = date_
-        today_date = date.today()
-        date_str = date_
-        date_time_obj = datetime.datetime.strptime(date_str, '%d.%m.%Y')
-        normal_date = date_time_obj.date()
-        age = int(((today_date - normal_date).days) / 365)
-        return age
+        birthday = datetime.strptime(date_, '%d.%m.%Y')
+        today = datetime.now()
+        return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
 
     def formatting_sex(self, int_sex):
         self.int_sex = int_sex
-        sex = ''
-        if int_sex == 1:
-            sex = 'женский'
-        elif int_sex == 2:
-            sex = 'мужской'
-        return sex
+        return 'женский' if int_sex == 1 else 'мужской'
 
     def formatting_marital_status(self, int_relation):
         self.int_relation = int_relation
@@ -116,8 +107,7 @@ class VK:
             dict_values['last_name'] = info['last_name']
             dict_values['sex'] = vk.formatting_sex(info['sex'])
             try:
-                dict_values['age'] = vk.calculate_age(
-                    info['bdate'])  # обход ошибки юзеров, кто не указывал дату рождения
+                dict_values['age'] = vk.calculate_age(info['bdate'])  # обход ошибки юзеров, кто не указывал дату рождения
             except KeyError:
                 dict_values['age'] = "Возраст был скрыт пользователем"
             dict_values['city'] = info['city']['title']
@@ -272,8 +262,7 @@ class VK:
             dict_values['last_name'] = info['last_name']
             dict_values['sex'] = vk.formatting_sex(info['sex'])
             try:
-                dict_values['age'] = vk.calculate_age(
-                    info['bdate'])  # обход ошибки юзеров, кто не указывал дату рождения
+                dict_values['age'] = vk.calculate_age(info['bdate'])  # обход ошибки юзеров, кто не указывал дату рождения
             except KeyError:
                 dict_values['age'] = "Возраст был скрыт пользователем"
             except ValueError:
@@ -310,10 +299,12 @@ class VK:
         return dict_with_men
 
 
+token_bot = 'vk1.a.O09EhkLWIil0UmXy7w3cyDv_RTJSZXD4I-WHq-e7tAAtX-98bt_2aH_WDTaMrlPrOpA1VXS3nMN32VwiTsJzQZQOo7IFfsIyOQg9zU00zWsIOyTXCJbXjR8w5sI0CZUXGJocKYUxV4MErXDHXkhUQPwu0dcDHcMCPXUW6CnxWqk59GdeaGAKmamAafJoxAip7YcXa9RqKmUgTmNXTM_I_A'
+
 user_id = '49293108'     # закрытый профиль, но с датой рождения
 user_id_2 = '119922158'  # открытый профиль но без даты рождения
 
-vk = VK(access_token, user_id, token_2)
+vk = VK(token_bot, user_id, token_2)
 # vk = VK(access_token, user_id_2, token_2)
 
 

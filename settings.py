@@ -1,12 +1,17 @@
-# Для общих настроек проекта.
 from dotenv import load_dotenv
 import os
 
 
 load_dotenv()
+
+# Токен от ВК бота:
 TOKEN_BOT = os.getenv('token_bot')
+
+# ID группы ВК, в которой находится БОТ:
 GROUP_ID_VK = int(os.getenv('group_id'))
-VK_KEY_API = None
+
+# Токен от VK-API:
+VK_KEY_API = os.getenv('vk_api_key')
 
 DATABASES = {
     'postgresql': {
@@ -18,4 +23,3 @@ DATABASES = {
         'BD_NAME': 'vk',
     }
 }
-

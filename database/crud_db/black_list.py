@@ -1,21 +1,32 @@
-# Импортируем необходимые модули
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-# Импортируем настройки базы данных из файла settings.py
-from settings import DATABASES
-# Импортируем модель BlackList из файла database/models.py
-from database.models import BlackList
+from sqlalchemy.exc import SQLAlchemyError
+from .. models import BlackList
+from database import Session
 
 
-class Connectbase:
-    """Конструктор класса принимает аргументы данные пользователя VK"""
-    def __init__(self, a, b, c, d):
-        pass
+class BlackListBD(Session):
+    table = BlackList
 
-        self.data_bd = DATABASES['postgresql']
-        """Формируем строку подключения к базе данных"""
-        self.path = (f"{self.data_bd['NAME']}://{self.data_bd['USER']}:{self.data_bd['PASSWORD']}@"
-                     f"{self.data_bd['HOST']}:{self.data_bd['PORT']}/{self.data_bd['BD_NAME']}")
+    def get_all_users(self, id_vk):
+        try:
+            with self.session() as sess:
+                return sess.query(self.table).filter_by(id_user=id_vk).all()
+        except SQLAlchemyError as e:
+            return -1, e
 
-    def blacklist(self):
-        pass
+    def delete_user_black_list(self, id_user, id_ignore_user):
+        try:
+            with self.session() as sess:
+                sess.query(self.table).filter_by(id_user=id_user, id_ignore_user=id_ignore_user).delete()
+                sess.commit()
+                return 1
+        except SQLAlchemyError as e:
+            return -1, e
+
+    def add_user_black_list(self, id_user, id_ignore_user):
+        try:
+            with self.session() as sess:
+                sess.add(self.table(id_user=id_user, id_ignore_user=id_ignore_user))
+                sess.commit()
+                return 1
+        except SQLAlchemyError as e:
+            return -1, e
