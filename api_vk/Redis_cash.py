@@ -19,19 +19,19 @@ def find_in_cash_with_id(id: int):
     return user_info if user_info else 'Пользователь не найден в кэше.'
 
 #Для сброса кеша команда flushdb() - приведет к удалению всех данных в текущей базе данных Redis
-def clear_cache():
+def clear_cache() -> str:
     r.flushdb()  # Это удалит все ключи в текущей базе данных
     return 'Кэш очищен'
 
 # Функция для обновления всего кеша
-def update_cache():
+def update_cache() -> str:
     for user_id, info in users_dict.items():
         # Сохраняем каждого пользователя в Redis
         r.set(f'user:{user_id}', json.dumps(info))
     return 'Кэш обновлен'
 
 #Выведем все, что у нас есть в кеше
-def print_all_users():
+def print_all_users() -> str | list:
     user_keys = r.keys('user:*')  # Получаем все ключи, начинающиеся с 'user:'
     all_users = []
     for key in user_keys:
@@ -42,7 +42,7 @@ def print_all_users():
     return all_users if all_users else 'Пользователь не найден в кэше.'
 
 #Удаление пользователя по id
-def delete_user(id: int):
+def delete_user(id: int) -> str:
     r.delete(f'user:{id}')
     return 'Пользователь удален из Redis'
 

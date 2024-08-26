@@ -2,11 +2,11 @@ import requests
 api_token = ''
 
 class SearchVK:
-    def __init__(self, token_api_vk, version='5.199'):
+    def __init__(self, token_api_vk: str, version='5.199'):
         self.basic_url = 'https://api.vk.com/method/'
         self.params = {'access_token': token_api_vk, 'v': version}
 
-    def get_user_info_vk(self, user_id):
+    def get_user_info_vk(self, user_id: str):
         params = {'user_ids': user_id,
                   'fields': 'screen_name, sex, city, relation, activities, about, bdate, interests, music, activities'}
         response = requests.get(self.basic_url + 'users.get', params={**params, **self.params})
@@ -31,7 +31,7 @@ class SearchVK:
             return response.json().get('error').get('error_msg')
         return response.json().get('response', {}).get('items', [])
 
-    def get_photo_user(self, user_id, place='profile', max_count=5):
+    def get_photo_user(self, user_id: str, place='profile', max_count=5):
         params = {'owner_id': user_id,
                   'album_id': place,
                   'extended': 1,
