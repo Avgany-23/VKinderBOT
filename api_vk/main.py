@@ -1,5 +1,5 @@
 import requests
-api_token = ''
+api_token = 'vk1.a.kJuuK4TCFYrrjuXtaDOOW-swUEM9DHOcoCZhNIb6fkYry8gcO-dvi2ksFoW0kjHhKQXmxSmk38KZOljZooGyio4MHrIGqbYVeQvidb4q8OHQV8FTZhe76xMz6-oSbYrr2yXee1RN73sEJn6oLYhcQlCCg6Yvc-MJrBp-53_1VYk0167x53hvwFsNjum3wHvtSoO_mPKcJHF2CkSuk-R0iA'
 
 
 class SearchVK:
@@ -51,3 +51,4 @@ class SearchVK:
 
 
 vk_get = SearchVK(api_token)
+users_data = vk_get.get_users_vk(1000, sex=2, age_from=20, is_closed = False)  # Получение пользователей, пример
