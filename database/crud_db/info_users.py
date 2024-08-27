@@ -1,62 +1,29 @@
-# Импортируем необходимые модули
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-# Импортируем настройки базы данных из файла settings.py
-from settings import DATABASES
-# Импортируем модель InfoUsers из файла database/models.py
+from sqlalchemy.exc import SQLAlchemyError
 from database.models import InfoUsers
+from database import Session
 
 
-"""Определяем класс Connectbase для подключения к базе данных"""
-class Connectbase:
-    """Конструктор класса принимает аргументы данные пользователя VK"""
-    def __init__(self, *args):
-        """Сохраняем настройки базы данных"""
-        self.data_bd = DATABASES['postgresql']
-        """Формируем строку подключения к базе данных"""
-        self.path = (f"{self.data_bd['NAME']}://{self.data_bd['USER']}:{self.data_bd['PASSWORD']}@"
-                     f"{self.data_bd['HOST']}:{self.data_bd['PORT']}/{self.data_bd['BD_NAME']}")
-        """Распаковываем информацию о пользователе"""
-        self.id_user = args[0]
-        self.name = args[1]
-        self.age = args[2]
-        self.gender = args[3]
-        self.marital_status = args[4]
-        self.city = args[5]
-        self.interests = args[6]
+class InfoUsersBd(Session):
+    table = InfoUsers
 
-
-    def infousers(self):
+    def add_info_users(self, id_user, **kwargs):
         """Функция для записи информации о пользователе"""
-        """Создаем соединение с базой данных"""
-        engine = sqlalchemy.create_engine(self.path)
-        """Создаем сессию для работы с базой данных"""
-        Session = sessionmaker(bind=engine)
-        """Используем контекстный менеджер для работы с сессией"""
-        with Session() as session:
-            """Добавляем информацию о пользователе"""
-            session.add(InfoUsers(id_user=self.id_user,
-                                  name=self.name,
-                                  age=self.age,
-                                  gender=self.gender,
-                                  marital_status=self.marital_status,
-                                  city=self.city,
-                                  interests=self.interests
-                                  ))
-            """Фиксируем изменения в базе данных"""
-            session.commit()
-            """Выводим сообщение об успешном создании пользователя"""
-            print(f"Пользоваль ID: {self.id_user} - создан")
+        try:
+            with self.session() as sess:
+                sess.add(self.table(id_user=id_user, **kwargs))
+                sess.commit()
+                return 1
+        except SQLAlchemyError as e:
+            return -1, e
 
-id_user = "1234537"
-name = "Ловелас"
-age = 21
-gender = "мужской"
-marital_status = "активный поиск"
-city = "Москва"
-interests = "Музыка"
-
-
-args = [id_user, name, age, gender, marital_status, city, interests]
-print(args[1])
-Connectbase(*args).infousers()
+    def get_info_user(self, id_vk):
+        """Получить информацию одного пользователя по id_vk"""
+        try:
+            with self.session() as sess:
+                user = sess.query(self.table).filter_by(id_user=id_vk).first()
+                if user is not None:
+                    return user
+                else:
+                    return -1  # Пользователь с таким id не найден
+        except SQLAlchemyError as e:
+            return -1, e
