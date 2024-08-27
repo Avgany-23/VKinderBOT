@@ -1,33 +1,29 @@
 from sqlalchemy.exc import SQLAlchemyError
-from database.models import Users
+from .. models import Users
 from database import Session
-from info_users import InfoUsersBd
+import sqlalchemy
+
 
 class UsersBd(Session):
     table = Users
 
     def get_one_user(self, id_vk):
-        """Получить одного пользователя по id_vk из модуля info_users"""
-        info_users_bd = InfoUsersBd()
-        result = info_users_bd.get_one_user(id_vk)
-        return result
-
-    def delete_user(self, id_vk):
-        """Удалить пользователя по id_vk"""
-        # Добавлен try-expect - обход ошибки при попытке удалить несуществующего пользователя
         try:
             with self.session() as sess:
-                user = sess.query(self.table).filter_by(id_vk=id_vk).first()
-                sess.delete(user)
+                return sess.query(self.table).filter_by(id_vk=id_vk).scalar()
+        except SQLAlchemyError as e:
+            return -1, e
+
+    def delete_user(self, id_vk):
+        try:
+            with (self.session() as sess):
+                sess.query(self.table).filter_by(id_vk=id_vk).delete()
                 sess.commit()
                 return 1
         except SQLAlchemyError as e:
-            # информация об ошибке е не передаю
             return -1
 
-
     def update_user_id(self, id_vk, new_id):
-        """Обновление id_vk у пользователя"""
         try:
             with self.session() as sess:
                 user = sess.query(self.table).filter_by(id_vk=id_vk).first()
@@ -37,19 +33,14 @@ class UsersBd(Session):
                     return 1
                 else:
                     return -1
-        except SQLAlchemyError as e:
-            # Информация об ошибке e не передается
-            return -1
+        except sqlalchemy.exc.IntegrityError as e:
+            return -1, e
 
-
-    def create_user(self, id_vk):
-        """Создать пользователя по id_vk"""
-        # Добавлен try-expect - обход ошибки при попытке добавить пользователя повторно
+    def create_user(self, id_vk: int) -> int:
         try:
             with self.session() as sess:
                 sess.add(self.table(id_vk=id_vk))
                 sess.commit()
                 return 1
-        except SQLAlchemyError as e:
-            # информация об ошибке е не передаю
-            return -1, e
+        except sqlalchemy.exc.IntegrityError:  # Если пользователь уже создался, то исключение
+            return 0

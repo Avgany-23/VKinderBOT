@@ -2,51 +2,28 @@ from sqlalchemy.exc import SQLAlchemyError
 from database.models import InfoUsers
 from database import Session
 
+
 class InfoUsersBd(Session):
     table = InfoUsers
 
-    def info_users(self, id_user,
-                   name=None,
-                   age=None,
-                   gender=None,
-                   marital_status=None,
-                   city=None,
-                   interests=None):
+    def add_info_users(self, id_user, **kwargs):
         """Функция для записи информации о пользователе"""
-        #Использую контекстный менеджер для работы с сессией
         try:
             with self.session() as sess:
-                """Добавляем информацию о пользователе"""
-                sess.add(InfoUsers(id_user=id_user,
-                                      name=name,
-                                      age=age,
-                                      gender=gender,
-                                      marital_status=marital_status,
-                                      city=city,
-                                      interests=interests
-                                      ))
-                """Фиксируем изменения в базе данных"""
+                sess.add(self.table(id_user=id_user, **kwargs))
                 sess.commit()
                 return 1
         except SQLAlchemyError as e:
-        # информация об ошибке е не передаю
-            return -1
+            return -1, e
 
-    def get_one_user(self, id_vk):
-        """Получить одного пользователя по id_vk"""
+    def get_info_user(self, id_vk):
+        """Получить информацию одного пользователя по id_vk"""
         try:
             with self.session() as sess:
-                user = sess.query(self.table.id_user,
-                                  self.table.name,
-                                  self.table.age,
-                                  self.table.gender,
-                                  self.table.marital_status,
-                                  self.table.city,
-                                  self.table.interests).filter_by(
-                    id_user=id_vk).first()
+                user = sess.query(self.table).filter_by(id_user=id_vk).first()
                 if user is not None:
                     return user
                 else:
                     return -1  # Пользователь с таким id не найден
         except SQLAlchemyError as e:
-            return -1
+            return -1, e

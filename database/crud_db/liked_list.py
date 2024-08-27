@@ -1,47 +1,37 @@
-from sqlalchemy.exc import SQLAlchemyError
-from database.models import LikedList
+from .. models import LikedList
 from database import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 
-class LikedListBb(Session):
+class LikedListBD(Session):
     table = LikedList
 
-    def add_like_user(self, id_user, id_like_user):
-        """Функция записывает id_vk понравившегося пользователя
-        текущему пользователю"""
-        # Использую контекстный менеджер для работы с сессией
+    def get_all_users(self, id_vk):
+        """Функция достаёт все отмеченные пользователем записи"""
         try:
             with self.session() as sess:
-                """Добавляем информацию о пользователях"""
-                sess.add(self.table(id_user=id_user,
-                                   id_like_user=id_like_user))
-                """Фиксируем изменения в базе данных"""
-                sess.commit()
-                return 1
+                return sess.query(self.table).filter_by(id_user=id_vk).all()
         except SQLAlchemyError as e:
-            # информация об ошибке е не передаю
             return -1
 
+    def get_all_marks_user(self, id_vk):
+        """Функция достаёт все записи, где отмечен пользователь"""
+        try:
+            with self.session() as sess:
+                return sess.query(self.table).filter_by(id_like_user=id_vk).all()
+        except SQLAlchemyError as e:
+            return -1
 
     def get_like_user(self, id_user, id_like_user):
-        """Функция удаляет id_vk понравившегося пользователя"""
-        # Использую контекстный менеджер для работы с сессией
+        """Функция достаёт одну отмеченную пользователем запись"""
         try:
             with self.session() as sess:
-                user = sess.query(self.table.id_user,
-                                  self.table.id_like_user).filter_by(
-                    id_user=id_user, id_like_user=id_like_user).first()
-                if user is not None:
-                    return user
-                else:
-                    return -1  # Пользователь с таким id не найден
+                return sess.query(self.table).filter_by(id_user=id_user, id_like_user=id_like_user)
         except SQLAlchemyError as e:
             return -1
 
-
-    def dell_like_user(self, id_user, id_like_user):
+    def delete_like_user(self, id_user, id_like_user):
         """Функция удаляет id_vk понравившегося пользователя"""
-        # Использую контекстный менеджер для работы с сессией
         try:
             with self.session() as sess:
                 user = sess.query(self.table).filter_by(id_user=id_user, id_like_user=id_like_user).first()
@@ -49,5 +39,15 @@ class LikedListBb(Session):
                 sess.commit()
                 return 1
         except SQLAlchemyError as e:
-            # информация об ошибке е не передаю
             return -1
+
+    def add_like_user(self, id_user, id_like_user):
+        """Функция записывает id_vk понравившегося пользователя текущему пользователю"""
+        try:
+            with self.session() as sess:
+                sess.add(self.table(id_user=id_user,
+                                    id_like_user=id_like_user))
+                sess.commit()
+                return 1
+        except SQLAlchemyError as e:
+            return -1, e
