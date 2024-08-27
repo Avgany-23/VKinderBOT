@@ -13,6 +13,9 @@ GROUP_ID_VK = int(os.getenv('group_id'))
 # Токен от VK-API:
 VK_KEY_API = os.getenv('vk_api_key')
 
+# Версия API-VK
+VK_VERSION = '5.199'  # Добавить её во все классы
+
 DATABASES = {
     'postgresql': {
         'NAME': 'postgresql',

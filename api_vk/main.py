@@ -9,12 +9,16 @@ class SearchVK:
     def get_user_vk(self, user_id):
         params = {'user_ids': user_id,
                   'fields': 'screen_name, sex, city, relation, activities, about, bdate, interests, music, activities'}
-        response = requests.get(self.basic_url + 'users.get', params={**params, **self.params}).json()['response'][0]
+
+        try:
+            response = requests.get(self.basic_url + 'users.get', params={**params, **self.params}).json()['response'][0]
+        except KeyError:
+            return 'Токен недоступен. Слишком много запросов или нужно заново авторизироваться'
         city = response.pop('city')
         id_user = response.pop('id')
         return {'city_title': city['title'], 'id_user': id_user, **response, 'city_id': city['id']}
 
-    def get_users_vk(self, count: int = 1000, **kwargs):
+    def get_users_vk(self, count: int = 1000, **kwargs) -> dict:
         """
         :param count: количество людей, которых нужно найти
         :type kwargs:   sex: int (1 or 2)
@@ -24,7 +28,8 @@ class SearchVK:
                         age_to: int,
                         has_photo: int (0 or 1),
                         is_closed: bool,
-                        fields: str.
+                        fields: str,
+                        is_closed: boole.
         """
         params = {'count': count,
                   **kwargs}
@@ -34,10 +39,12 @@ class SearchVK:
         return response.json()['response']['items']
 
     def get_photo_user(self, user_id, place='profile', max_count=5):
+        """place in ('profile', 'wall')"""
         params = {'owner_id': user_id,
                   'album_id': place,
                   'extended': 1,
-                  'count': max_count}
+                  'count': max_count,
+                  'rev': 1}
         response = requests.get(self.basic_url + 'photos.get', params={**params, **self.params}).json()
         try:
             list_photos = {}
@@ -46,7 +53,6 @@ class SearchVK:
                     'photo_url': photo['sizes'][-1]['url'],
                     'likes': photo['likes']['count'],
                 }
-                print(photo)
             return list_photos
         except KeyError as e:
-            return f'Произошла ошибка\n{e}'
+            return -1

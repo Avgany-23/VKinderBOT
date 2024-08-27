@@ -43,40 +43,46 @@ def filters_menu() -> VkKeyboard:
                                  payload={"type": "show_snackbar", "text": "Выбор возраста"})
     keyboard.add_button('14-18',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "14-18"})
+                                 payload={"type": "filter_14-18"})
     keyboard.add_button('19-25',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "19-25"})
+                                 payload={"type": "filter_19-25"})
     keyboard.add_button('26-35',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "26-35"})
+                                 payload={"type": "filter_26-35"})
     keyboard.add_button('>35',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": ">35"})
+                                 payload={"type": "filter_>35"})
     keyboard.add_line()
     keyboard.add_callback_button('Пол:',
                                  color=VkKeyboardColor.POSITIVE,
                                  payload={"type": "show_snackbar", "text": "Выбор пола"})
     keyboard.add_button('мужской',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "sex-male"})
+                                 payload={"type": "filter_sex-male"})
     keyboard.add_button('женский',
                                  color=VkKeyboardColor.SECONDARY,
-                                 payload={"type": "sex-female"})
+                                 payload={"type": "filter_sex-female"})
     return keyboard
 
 
-# def like_or_block_menu() -> VkKeyboard:
-#     """Список отмеченных/заблокированных пользователей"""
-#     keyboard = VkKeyboard(one_time=False, inline=True)
-#     keyboard.add_callback_button('Тут будут фильтры',
-#                                  color=VkKeyboardColor.SECONDARY,
-#                                  payload={"type": "search_people"})
-#     keyboard.add_line()
-#     keyboard.add_button('Вернуться назад',
-#                                  color=VkKeyboardColor.SECONDARY,
-#                                  payload={"type": "main_menu"})
-#     return keyboard
+def search_inline() -> VkKeyboard:
+    """Список отмеченных/заблокированных пользователей"""
+    keyboard = VkKeyboard(one_time=False, inline=True)
+    keyboard.add_button('⬅Предыдущий человек',
+                                 color=VkKeyboardColor.PRIMARY,
+                                 payload={"type": "prev_people"})
+    keyboard.add_callback_button('➡️Следующий человек',
+                                 color=VkKeyboardColor.POSITIVE,
+                                 payload={"type": "next_people"})
+    keyboard.add_line()
+    keyboard.add_callback_button('❌Больше не показывать',
+                                 color=VkKeyboardColor.NEGATIVE,
+                                 payload={"type": "show_snackbar", "text": "Пользователь добавлен в черный список"})
+    keyboard.add_callback_button('💛Сохранить в список',
+                                 color=VkKeyboardColor.POSITIVE,
+                                 payload={"type": "show_snackbar", "text": "Пользователь добавлен в список избранного"})
+    return keyboard
 
 
 def search_menu():

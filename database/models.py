@@ -15,11 +15,13 @@ class Users(basic):
     blacklist: Mapped['BlackList'] = relationship(back_populates='users', uselist=True)
     likedlist: Mapped['LikedList'] = relationship(back_populates='users', uselist=True)
     userfilter: Mapped['FiltersUsers'] = relationship(back_populates='users', uselist=False)
+    searchpeople: Mapped['SearchPeople'] = relationship(back_populates='users', uselist=True)
 
-class InfoUsers(basic):
-    """Модель с информацией о пользователях"""
-    __tablename__ = 'infousers'
+    def __str__(self):
+        return f"id_vk: {self.id_vk}"
 
+
+class InfoPeople:
     id = Column(Integer, primary_key=True)
     id_user = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'), unique=True)
     first_name = Column(CHAR(length=255))
@@ -37,7 +39,25 @@ class InfoUsers(basic):
     music = Column(Text)
     relation = Column(Integer)
 
+
+class InfoUsers(basic, InfoPeople):
+    """Модель с информацией о пользователях"""
+    __tablename__ = 'infousers'
+
     users: Mapped['Users'] = relationship(back_populates='infouser', uselist=False)
+
+
+class SearchPeople(basic):
+    """Для хранения людей, которые будут выдаваться пользователю при показе анкет"""
+    __tablename__ = 'searchpeople'
+    id = Column(Integer, primary_key=True)
+    id_user = Column(BigInteger)
+    id_user_main = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'))
+    users: Mapped['Users'] = relationship(back_populates='searchpeople', uselist=False)
+
+    __table_args__ = (
+        UniqueConstraint('id_user', 'id_user_main', name='unique_user_search_users'),
+    )
 
 
 class BlackList(basic):

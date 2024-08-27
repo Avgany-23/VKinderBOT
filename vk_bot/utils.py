@@ -7,14 +7,13 @@ from database.crud_db.info_users import InfoUsersBd
 from database.crud_db.filters_users import UsersFiltersBd
 from api_vk.main import SearchVK
 from settings import VK_KEY_API
-from typing import Callable
 import json
 
 
-def decorator_check_users_or_create_him(id_vk: int) -> Callable[[Callable], Callable]:
-    def decorator(func) -> Callable:
+def decorator_check_users_or_create_him(id_vk: int):
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs) -> func:
+        def wrapper(*args, **kwargs):
             create_user = UsersBd().create_user(id_vk)
             if create_user:  # Если пользователь создался, значит надо инициализировать его в InfoUsers и FiltersUsers
                 vk_user = SearchVK(VK_KEY_API)
@@ -24,6 +23,19 @@ def decorator_check_users_or_create_him(id_vk: int) -> Callable[[Callable], Call
             return func(*args, **kwargs)
         return wrapper
     return decorator
+
+
+# def decorator_find_user_search(id_user: int):
+#     """"""
+#     def decorator(func):
+#         def wrapper(*args, **kwargs):
+#             save_search_people(id_user)
+#             info_user = get_message_search(id_user)
+#             result = func(*args, **kwargs)
+#
+#             return result
+#         return wrapper
+#     return decorator
 
 
 def correct_size_photo(path: str, width: int = 1300, height: int = 800) -> None:
@@ -78,6 +90,7 @@ def carousel_str(photo_id: list, label: str = 'Поставить лайк') -> 
 
 
 def calculate_age(date_: str) -> int:
+    """Определяет возраст человека (в годах)"""
     birthday = datetime.strptime(date_, '%d.%m.%Y')
     today = datetime.now()
     return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
