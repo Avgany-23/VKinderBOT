@@ -1,6 +1,6 @@
 import redis
 import json
-from main import users_data #не забудь токен от вк вставить в main
+from main import users_data #ВАЖНО! для users_data в main нужен токен=ключ доступа пользователя
 
 
 """users_data-это список со словарями, нужен словарь """
@@ -47,10 +47,4 @@ def delete_user(id: int) -> str:
     return 'Пользователь удален из Redis'
 
 
-#вызов функций
-# print(find_in_cash_with_id(643640731))
-# print(delete_user(643640731))
-# print(clear_cache())
-# print(update_cache())
-# print(print_all_users())
 

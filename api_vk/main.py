@@ -1,6 +1,7 @@
 import requests
 api_token = ''
 
+
 class SearchVK:
     def __init__(self, token_api_vk: str, version='5.199'):
         self.basic_url = 'https://api.vk.com/method/'
