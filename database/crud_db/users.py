@@ -7,14 +7,14 @@ import sqlalchemy
 class UsersBd(Session):
     table = Users
 
-    def get_one_user(self, id_vk):
+    def get_one_user(self, id_vk: int):
         try:
             with self.session() as sess:
                 return sess.query(self.table).filter_by(id_vk=id_vk).scalar()
         except SQLAlchemyError as e:
             return -1, e
 
-    def delete_user(self, id_vk):
+    def delete_user(self, id_vk: int):
         try:
             with (self.session() as sess):
                 sess.query(self.table).filter_by(id_vk=id_vk).delete()
@@ -23,7 +23,7 @@ class UsersBd(Session):
         except SQLAlchemyError as e:
             return -1
 
-    def update_user_id(self, id_vk, new_id):
+    def update_user_id(self, id_vk: int, new_id: int):
         try:
             with self.session() as sess:
                 user = sess.query(self.table).filter_by(id_vk=id_vk).first()

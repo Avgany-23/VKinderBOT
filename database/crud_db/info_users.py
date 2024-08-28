@@ -6,7 +6,7 @@ from database import Session
 class InfoUsersBd(Session):
     table = InfoUsers
 
-    def add_info_users(self, id_user, **kwargs):
+    def add_info_users(self, id_user: int, **kwargs):
         """Функция для записи информации о пользователе"""
         try:
             with self.session() as sess:
@@ -16,7 +16,7 @@ class InfoUsersBd(Session):
         except SQLAlchemyError as e:
             return -1, e
 
-    def get_info_user(self, id_vk):
+    def get_info_user(self, id_vk: int):
         """Получить информацию одного пользователя по id_vk"""
         try:
             with self.session() as sess:

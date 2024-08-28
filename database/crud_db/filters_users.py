@@ -6,7 +6,7 @@ from database import Session
 class UsersFiltersBd(Session):
     table = FiltersUsers
 
-    def add_filters_users(self, id_user, **kwargs):
+    def add_filters_users(self, id_user: int, **kwargs):
         """Функция для записи информации о фильтрах пользователя"""
         try:
             with self.session() as sess:
@@ -16,7 +16,7 @@ class UsersFiltersBd(Session):
         except SQLAlchemyError as e:
             return -1, e
 
-    def get_filters_user(self, id_vk):
+    def get_filters_user(self, id_vk: int):
         """Получить фильтры одного пользователя по id_vk"""
         try:
             with self.session() as sess:
@@ -28,7 +28,7 @@ class UsersFiltersBd(Session):
         except SQLAlchemyError as e:
             return -1, e
 
-    def update_filters_user(self, id_vk, **kwargs):
+    def update_filters_user(self, id_vk: int, **kwargs):
         """Изменение фильтров пользователя"""
         with self.session() as sess:
             try:

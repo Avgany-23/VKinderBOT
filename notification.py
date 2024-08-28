@@ -10,6 +10,7 @@ from database.crud_db.info_users import InfoUsersBd
 from database.crud_db.liked_list import LikedListBD
 from database.crud_db.black_list import BlackListBD
 from database.crud_db.users import UsersBd
+from settings import DATABASES
 # print(search_people_and_save(240353515))
 # print(search(240353515, VK_KEY_API))
 print(SearchVK(VK_KEY_API).get_user_vk(240353515))
@@ -49,15 +50,27 @@ new_id = 1000000
 test_one_id = 1234537
 #Test_info_user
 id_user = 1234537
-name = "Ловелас"
-age = 21
-gender = "мужской"
-marital_status = "активный поиск"
-city = "Москва"
-interests = "Музыка"
+kwargs = {"first_name": "Ловелас",
+"last_name": "Донжуанович",
+"screen_name": "Твоя мечта",
+"sex": "2",
+"can_access_closed": True,
+"is_closed": False,
+"bdate": "12.12.2024",
+"city_id": 3,
+"city_title": "Секретный",
+"interests": "Python",
+"about": "Я питонист",
+"activities": "Тест",
+"music": "Шифутинский",
+"relation": 1}
 #Test_liked_list
 id_user = 1234537
 id_like_user = 999
 #Test_black_list
 id_user = 1234537
 id_ignore_user = 888
+
+data_bd = DATABASES['postgresql']
+PATH = (f"{data_bd['NAME']}://{data_bd['USER']}:{data_bd['PASSWORD']}@"
+    f"{data_bd['HOST']}:{data_bd['PORT']}/{data_bd['BD_NAME']}")

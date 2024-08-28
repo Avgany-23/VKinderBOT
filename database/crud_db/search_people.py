@@ -6,7 +6,7 @@ from database import Session
 class SearchPeopleBd(Session):
     table = SearchPeople
 
-    def add_user(self, id_user_main, id_user):
+    def add_user(self, id_user_main: int, id_user: int):
         """Функция для сохранения человека для отображения пользователю id_user_main"""
         try:
             with self.session() as sess:
@@ -35,7 +35,7 @@ class SearchPeopleBd(Session):
         except SQLAlchemyError as e:
             return -1, e
 
-    def delete_user(self, id_user_main, id_users):
+    def delete_user(self, id_user_main: int, id_users: int):
         """Удаление одной записи у пользователя id_user_main"""
         try:
             with self.session() as sess:
@@ -45,7 +45,7 @@ class SearchPeopleBd(Session):
         except SQLAlchemyError as e:
             return -1, e
 
-    def delete_user_all(self, id_user_main):
+    def delete_user_all(self, id_user_main: int):
         """Удаление всех записей у пользователя id_user_main"""
         try:
             with self.session() as sess:

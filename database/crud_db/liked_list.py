@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 class LikedListBD(Session):
     table = LikedList
 
-    def get_all_users(self, id_vk):
+    def get_all_users(self, id_vk: int):
         """Функция достаёт все отмеченные пользователем записи"""
         try:
             with self.session() as sess:
@@ -14,7 +14,7 @@ class LikedListBD(Session):
         except SQLAlchemyError as e:
             return -1
 
-    def get_all_marks_user(self, id_vk):
+    def get_all_marks_user(self, id_vk: int):
         """Функция достаёт все записи, где отмечен пользователь"""
         try:
             with self.session() as sess:
@@ -22,7 +22,7 @@ class LikedListBD(Session):
         except SQLAlchemyError as e:
             return -1
 
-    def get_like_user(self, id_user, id_like_user):
+    def get_like_user(self, id_user: int, id_like_user: int):
         """Функция достаёт одну отмеченную пользователем запись"""
         try:
             with self.session() as sess:
@@ -30,7 +30,7 @@ class LikedListBD(Session):
         except SQLAlchemyError as e:
             return -1
 
-    def delete_like_user(self, id_user, id_like_user):
+    def delete_like_user(self, id_user: int, id_like_user: int):
         """Функция удаляет id_vk понравившегося пользователя"""
         try:
             with self.session() as sess:
@@ -41,7 +41,7 @@ class LikedListBD(Session):
         except SQLAlchemyError as e:
             return -1
 
-    def add_like_user(self, id_user, id_like_user):
+    def add_like_user(self, id_user: int, id_like_user: int):
         """Функция записывает id_vk понравившегося пользователя текущему пользователю"""
         try:
             with self.session() as sess:

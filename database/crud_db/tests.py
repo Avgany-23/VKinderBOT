@@ -1,6 +1,6 @@
 from unittest import TestCase
-from notification import users_bd, id_vk, old_id, new_id, test_one_id, info_users_bd, id_user, name, age
-from notification import gender, marital_status, city, interests, liked_list_bd, id_like_user, black_list_bd
+from notification import users_bd, id_vk, old_id, new_id, test_one_id, info_users_bd, id_user
+from notification import liked_list_bd, id_like_user, black_list_bd, kwargs
 from notification import id_ignore_user
 
 class Test_users_operations(TestCase):
@@ -50,30 +50,13 @@ class Test_info_users(TestCase):
     def test_info_users(self):
         """Тест проверяет работу функции info_users
         Функция загружает информацию о пользователе"""
-        kwargs = {"city_title":city, "interests":interests}
         result = info_users_bd.add_info_users(id_user, **kwargs)
         # Успешная загрузка информации == 1
         expected = 1
         self.assertEqual(expected, result, 'Результат теста: Информация о пользователе не загружена.')
 
-"""    id = Column(Integer, primary_key=True)
-    id_user = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'), unique=True)
-    first_name = Column(CHAR(length=255))
-    last_name = Column(CHAR(length=255))
-    screen_name = Column(CHAR(length=255))
-    sex = Column(Integer)
-    can_access_closed = Column(Boolean)
-    is_closed = Column(Boolean)
-    bdate = Column(Date)
-    city_id = Column(Integer)
-    city_title = Column(CHAR(length=255))
-    interests = Column(Text)
-    about = Column(Text)
-    activities = Column(Text)
-    music = Column(Text)
-    relation = Column(Integer)"""
-class Test_liked_list(TestCase):
 
+class Test_liked_list(TestCase):
     def test_add_like_user(self):
         """Тест проверяет работу функции add_like_user
         Функция добавляет ID пользователя в Like"""
