@@ -11,7 +11,7 @@ class LikedListBD(Session):
         try:
             with self.session() as sess:
                 return sess.query(self.table).filter_by(id_user=id_vk).all()
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             return -1
 
     def get_all_marks_user(self, id_vk):
@@ -19,7 +19,7 @@ class LikedListBD(Session):
         try:
             with self.session() as sess:
                 return sess.query(self.table).filter_by(id_like_user=id_vk).all()
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             return -1
 
     def get_like_user(self, id_user, id_like_user):
@@ -27,7 +27,7 @@ class LikedListBD(Session):
         try:
             with self.session() as sess:
                 return sess.query(self.table).filter_by(id_user=id_user, id_like_user=id_like_user)
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             return -1
 
     def delete_like_user(self, id_user, id_like_user):
@@ -38,15 +38,26 @@ class LikedListBD(Session):
                 sess.delete(user)
                 sess.commit()
                 return 1
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             return -1
 
-    def add_like_user(self, id_user, id_like_user):
+    def delete_like_all_user(self, id_user):
+        """Функция удалит все записи с LikedList.id_user = id_user"""
+        try:
+            with self.session() as sess:
+                sess.query(self.table).filter_by(id_user=id_user).delete()
+                sess.commit()
+                return 1
+        except SQLAlchemyError:
+            return -1
+
+    def add_like_user(self, id_user, id_like_user, name_user):
         """Функция записывает id_vk понравившегося пользователя текущему пользователю"""
         try:
             with self.session() as sess:
                 sess.add(self.table(id_user=id_user,
-                                    id_like_user=id_like_user))
+                                    id_like_user=id_like_user,
+                                    name_user=name_user))
                 sess.commit()
                 return 1
         except SQLAlchemyError as e:

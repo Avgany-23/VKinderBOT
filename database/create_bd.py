@@ -4,11 +4,11 @@ from models import basic
 from settings import DATABASES
 
 
-def check_bd(path: str) -> bool:
+def check_bd(path_: str) -> bool:
     """Функция проверяет, существуют ли таблицы в БД. Принимает конфиг к Базе Данных - path
     Если хоть 1 таблица с именем созданных моделей будет существовать,
     то выдаст ошибку, в ином случае вернёт True"""
-    engine = create_engine(path)
+    engine = create_engine(path_)
     with engine.connect() as conn:
         tables = []                                         # Список существующих таблиц
         for table in basic.__subclasses__():                # проход по всем созданным моделям
@@ -42,4 +42,4 @@ if __name__ == '__main__':
 
     # --- Если ни одной таблицы в БД с названием моделей не существует, то создается новая база данных ---
     if check_bd(path):
-        create_bd(path)  # Создание БД
+        create_bd(path)   # Создание БД
