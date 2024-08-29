@@ -5,7 +5,7 @@ import os
 load_dotenv()
 
 # Токен от ВК бота:
-TOKEN_BOT = os.getenv('token_bot')
+TOKEN_BOT = os.getenv('token_bot2')
 
 # ID группы ВК, в которой находится БОТ:
 GROUP_ID_VK = int(os.getenv('group_id'))
@@ -24,5 +24,12 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
         'BD_NAME': 'vk',
+    },
+    'redis': {
+        'host': 'localhost',
+        'port': 6379,
+        'db': 0,
+        'decode_responses': True,
+        'charset': "utf-8",
     }
 }

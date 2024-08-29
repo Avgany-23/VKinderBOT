@@ -1,3 +1,5 @@
+from redis import ConnectionError, Redis
+
 from database.crud_db.filters_users import UsersFiltersBd
 from database.crud_db.search_people import SearchPeopleBd
 from database.crud_db import liked_list, black_list
@@ -8,14 +10,17 @@ from vk_api.keyboard import VkKeyboard
 from database import session_bd, PATH
 from api_vk.main import SearchVK
 from settings import VK_KEY_API
-from typing import Optional
+from typing import Optional, Tuple
 from random import shuffle
 from vk_api import VkApi
+from settings import DATABASES
 from .utils import (choose_plural,
                     correct_size_photo,
                     get_photo_vk_id,
                     carousel_str,
                     calculate_age)
+import redis
+import json
 import re
 
 
@@ -41,10 +46,6 @@ def send_message(vk: VkApi,
     vk.method('messages.send', values)
 
 
-def edit_message(vk) -> None:
-    ...
-
-
 def snow_snackbar(vk: VkApi, event_id: str, user_id: int, peer_id: int, event_data: str):
     """Отправка всплывающего сообщения"""
     values = {
@@ -68,7 +69,8 @@ def list_users(id_vk: int, count: int = 15, list_user: str = 'Like list') -> str
     message = choose_plural(count, ('отмеченный', 'отмеченных', 'отмеченных') if list_user == 'like list'
                             else ('игнорируемый', 'игнорируемых', 'игнорируемых'))
     count_user = len(result) if len(result) < count else count
-    return f"{'Список' if count > 2 else ''} {count_user} {message[1]} вами пользователей: {result}"
+    return (f"{'Список' if count > 2 else ''} {count_user} {message[1]} вами пользователей:\n"
+            f"{result}")
 
 
 def browsing_history(count):
@@ -142,17 +144,15 @@ def get_message_search(id_vk: int) -> dict:
             .join(SearchPeople, SearchPeople.id_user_main == Users.id_vk).first())
     search = SearchVK(VK_KEY_API)
     user_info = search.get_user_vk(user[1])
-
     attachment = get_id_vk_users_photo(user_info['id_user'])
-
     return {
         'message': f"Имя: {user_info['first_name']} {user_info['last_name']}\n"
                    f"Возраст: {calculate_age(user_info['bdate'])}\n"
                    f"Город: {user_info['city_title']}\n"
-                   f"Ссылка на профиль: {'https://vk.com/id' + str(user[1])}\n"
                    f"{'Профиль скрыт, есть только главная фотография по ссылке на профиль' if not attachment else ''}",
-        'attachment': attachment,
-        'id_user': user_info['id_user']
+        'attachment': ','.join(attachment) if attachment else None,
+        'id_user': user_info['id_user'],
+        'url_profile': 'https://vk.com/id' + str(user[1])
     }
 
 
@@ -194,3 +194,103 @@ def get_id_vk_users_photo(id_user: int) -> list[str]:
         attachment = None
 
     return attachment
+
+
+def redis_connect() -> tuple[str, ConnectionError] | Redis:
+    redis_data = DATABASES['redis']
+    try:
+        connect = redis.StrictRedis(host=redis_data['host'],
+                                    port=redis_data['port'],
+                                    db=redis_data['db'],
+                                    decode_responses=redis_data['decode_responses'],
+                                    charset=redis_data['charset'],)
+    except redis.exceptions.ConnectionError as e:
+        return 'Ошибка при подключении к Redis', e
+    return connect
+
+
+def redis_set_person(id_user: int, message: dict) -> None:
+    """Для записи в redis"""
+    redis_r = redis_connect()
+    key = f"search_{id_user}"
+    redis_r.lpush(key, json.dumps(message))
+    if redis_r.llen(key) > 3:
+        redis_r.rpop(key)
+    redis_r.close()
+
+
+def redis_set_current_person(id_user: int, id_search_user: int) -> None:
+    """Установить в памяти текущий id анкеты пользователя"""
+    redis_r = redis_connect()
+    redis_r.set(f'current_person_{id_user}', id_search_user)
+    redis_r.close()
+
+
+def redis_get_current_person(id_user: int) -> str:
+    """Получить id текущей анкеты пользователя"""
+    redis_r = redis_connect()
+    return redis_r.get(f'current_person_{id_user}')
+
+
+def redis_get_person_info(id_user: int) -> dict:
+    """Получить информацию о последнем пользователе по id"""
+    redis_r = redis_connect()
+    list_keys = [json.loads(i) for i in redis_r.lrange(f"search_{id_user}", 0, -1)]
+    return list_keys[-1]
+
+
+def redis_person_is_current(id_user: int) -> bool:
+    """Проверить, находимся ли на последней анкете"""
+    redis_r = redis_connect()
+    list_keys = [json.loads(i)['id_user'] for i in redis_r.lrange(f"search_{id_user}", 0, -1)]
+    try:
+        return int(list_keys[0]) == int(redis_get_current_person(id_user))
+    except KeyError:
+        return True
+
+
+def redis_person_is_last(id_user: int) -> bool:
+    """Проверить, находимся ли на последней анкете"""
+    redis_r = redis_connect()
+    list_keys = [json.loads(i)['id_user'] for i in redis_r.lrange(f"search_{id_user}", 0, -1)]
+    return int(list_keys[-1]) == int(redis_get_current_person(id_user))
+
+
+def redis_get_prev_person(id_user: int) -> dict | str:
+    redis_r = redis_connect()
+    try:
+        current_persons = [json.loads(i) for i in redis_r.lrange(f'search_{id_user}', 0, -1)]
+        current_persons_list = [i['id_user'] for i in current_persons]
+    except IndexError:
+        return 'empty list'
+    current_person = redis_r.get(f'current_person_{id_user}')
+    prev_person_index = current_persons_list.index(int(current_person)) + 1
+    if len(current_persons_list) <= prev_person_index:
+        return 'end list'
+    prev_person_id = current_persons_list[prev_person_index]
+    for person in current_persons:
+        if person['id_user'] == prev_person_id:
+            return person
+
+
+def redis_get_next_person(id_user: int) -> dict | str:
+    redis_r = redis_connect()
+    try:
+        current_persons = [json.loads(i) for i in redis_r.lrange(f'search_{id_user}', 0, -1)]
+        current_persons_list = [i['id_user'] for i in current_persons]
+    except IndexError:
+        return 'empty list'
+    current_person = redis_r.get(f'current_person_{id_user}')
+    prev_person_index = current_persons_list.index(int(current_person)) - 1
+    if len(current_persons_list) <= prev_person_index:
+        return 'end list'
+    prev_person_id = current_persons_list[prev_person_index]
+    for person in current_persons:
+        if person['id_user'] == prev_person_id:
+            return person
+
+
+def redis_clear_user_id(id_user: int) -> None:
+    redis_r = redis_connect()
+    redis_r.delete(f'current_person_{id_user}')
+    redis_r.delete(f'search_{id_user}')
