@@ -1,9 +1,16 @@
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_bot.utils import decorator_check_users_or_create_him
+from database.crud_db.black_list import BlackListBD
+from database.crud_db.liked_list import LikedListBD
+from database.crud_db.search_people import SearchPeopleBd
+from database.requests_redis import redis_clear_user_id, redis_set_person, redis_set_current_person, \
+    redis_save_history, redis_browsing_history, redis_person_is_current, redis_get_next_person, redis_get_person_info, \
+    redis_get_prev_person
+from vk_bot.bot_function import get_message_search, save_search_people, send_message, list_users, change_filter_age, \
+    change_filter_sex, change_filter_status, change_filter_city, snow_snackbar, user_filters
+from vk_bot.menu_button import search_inline, filters_menu, main_menu, like_block_list
+from vk_bot.utils import decorator_check_users_or_create_him, message_status, message_city
 from settings import TOKEN_BOT, GROUP_ID_VK, HISTORY_SIZE
-from vk_bot.menu_button import *
-from vk_bot.bot_function import *
-from database.requests_redis import *
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_api import VkApi
 import json
 import re
 
@@ -155,7 +162,7 @@ for event in long_poll.listen():
 
             # --- Если следующей анкеты нет в кеше Redis, то достать данные из PostgresSQL ---
             if redis_person_is_current(id_user):
-                save_search_people(id_user)  # Сохранение людей, если их нет
+                save_search_people(id_user)                                  # Сохранение людей, если их нет
                 info_user = get_message_search(id_user)                      # Информацию о первой найденной анкете
                 redis_save_history(id_user, info_user, size=HISTORY_SIZE)    # Сохранение в историю анкет Redis
                 SearchPeopleBd().delete_user(id_user, info_user['id_user'])  # Удаление прошлой записи

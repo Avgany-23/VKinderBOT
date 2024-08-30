@@ -4,6 +4,8 @@ import sqlalchemy
 
 
 data_bd = DATABASES['postgresql']
+# data_bd = DATABASES_TEST['postgresql']
+
 PATH = (f"{data_bd['NAME']}://{data_bd['USER']}:{data_bd['PASSWORD']}@"
         f"{data_bd['HOST']}:{data_bd['PORT']}/{data_bd['BD_NAME']}")
 
@@ -16,7 +18,7 @@ def session_bd(path: str) -> sessionmaker:
 class Session:
     table = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = session_bd(PATH)
 
     def get_all(self) -> iter:

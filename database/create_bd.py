@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, create_engine
 from database import PATH
-from models import basic
+from database.models import basic
 import sqlalchemy
 
 
