@@ -15,6 +15,7 @@ class SearchVK:
             response = requests.get(self.basic_url + 'users.get',
                                     params={**params, **self.params}).json()['response'][0]
         except KeyError:
+            print('Токен недоступен')
             return 'Токен недоступен. Слишком много запросов или нужно заново авторизоваться'
         city = response.pop('city')
         id_user = response.pop('id')

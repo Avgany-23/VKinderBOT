@@ -5,7 +5,7 @@ import os
 load_dotenv()
 
 # Токен от ВК бота:
-TOKEN_BOT = os.getenv('token_bot2')
+TOKEN_BOT = os.getenv('token_bot')
 
 # ID группы ВК, в которой находится БОТ:
 GROUP_ID_VK = int(os.getenv('group_id'))
