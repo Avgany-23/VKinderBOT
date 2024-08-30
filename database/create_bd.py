@@ -1,14 +1,31 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, create_engine
+from database import PATH
 from models import basic
-from settings import DATABASES
+import sqlalchemy
 
 
-def check_bd(path: str) -> bool:
+def create_object_db(path: str) -> tuple[int, None] | tuple[int, str]:
+    """Создание Базы Данных по пути path"""
+
+    for_create_path = path[:path.rfind('/')]
+    for_create_db = path[path.rfind('/') + 1:]
+
+    try:
+        with sqlalchemy.create_engine(for_create_path, isolation_level='AUTOCOMMIT').connect() as connection:
+            connection.execute(text(f'CREATE DATABASE {for_create_db}'))
+        return 1, None
+    except (sqlalchemy.exc.OperationalError, UnicodeDecodeError) as e:
+        return -1, e
+    except sqlalchemy.exc.ProgrammingError as e:
+        return -2, e
+
+
+def check_bd(path_: str) -> bool:
     """Функция проверяет, существуют ли таблицы в БД. Принимает конфиг к Базе Данных - path
     Если хоть 1 таблица с именем созданных моделей будет существовать,
     то выдаст ошибку, в ином случае вернёт True"""
-    engine = create_engine(path)
+    engine = create_engine(path_)
     with engine.connect() as conn:
         tables = []                                         # Список существующих таблиц
         for table in basic.__subclasses__():                # проход по всем созданным моделям
@@ -30,16 +47,16 @@ def create_bd(info_path: str) -> None:
     session = sessionmaker(engine)()    # Подключение к сессии
     basic.metadata.drop_all(engine)     # Удаление таблиц с таким же именем, если они есть
     basic.metadata.create_all(engine)   # Создание таблиц
-    print('БД успешна создана')         # Оповещение об успешном создании БД
     session.commit(), session.close()   # Коммит и закрытие сессии
 
 
 if __name__ == '__main__':
-    # --- Получение данных о Базе Данных (название, логин, пароль) ---
-    data_bd = DATABASES['postgresql']
-    path = (f"{data_bd['NAME']}://{data_bd['USER']}:{data_bd['PASSWORD']}@"
-            f"{data_bd['HOST']}:{data_bd['PORT']}/{data_bd['BD_NAME']}")
-
-    # --- Если ни одной таблицы в БД с названием моделей не существует, то создается новая база данных ---
-    if check_bd(path):
-        create_bd(path)  # Создание БД
+    # --- Создание Базы Данных и таблиц в ней ---
+    create_bd_ = create_object_db(PATH)
+    if create_bd_[0] == -1:
+        print('Создание Базы Данных не произошло. Неправильно указаны настройки к подключению')
+    elif create_bd_[0] == -2:
+        print('Созданы Базы данных не произошло. База данных с таким именем уже существует')
+    if check_bd(PATH):
+        create_bd(PATH)   # Создание БД
+        print('База данных и таблицы успешно созданы')

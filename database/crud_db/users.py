@@ -20,7 +20,7 @@ class UsersBd(Session):
                 sess.query(self.table).filter_by(id_vk=id_vk).delete()
                 sess.commit()
                 return 1
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             return -1
 
     def update_user_id(self, id_vk, new_id):

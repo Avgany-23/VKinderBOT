@@ -14,7 +14,20 @@ GROUP_ID_VK = int(os.getenv('group_id'))
 VK_KEY_API = os.getenv('vk_api_key')
 
 # Версия API-VK
-VK_VERSION = '5.199'  # Добавить её во все классы
+VK_VERSION = '5.199'
+
+# Размер кеша для сохранения истории просмотров анкет
+HISTORY_SIZE = 15
+
+# Для Telegram Бота (отправка логов). По умолчанию выключен - include = False. include = True - включить
+tg_bot = {
+    'include': False,
+    'data': {
+        'token': '',
+        'login': '',
+        'password': ''
+    }
+}
 
 DATABASES = {
     'postgresql': {
@@ -24,5 +37,12 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
         'BD_NAME': 'vk',
+    },
+    'redis': {
+        'host': 'localhost',
+        'port': 6379,
+        'db': 0,
+        'decode_responses': True,
+        'charset': "utf-8",
     }
 }

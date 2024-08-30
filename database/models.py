@@ -50,6 +50,7 @@ class InfoUsers(basic, InfoPeople):
 class SearchPeople(basic):
     """Для хранения людей, которые будут выдаваться пользователю при показе анкет"""
     __tablename__ = 'searchpeople'
+
     id = Column(Integer, primary_key=True)
     id_user = Column(BigInteger)
     id_user_main = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'))
@@ -67,6 +68,7 @@ class BlackList(basic):
     id = Column(BigInteger, primary_key=True)
     id_user = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'))
     id_ignore_user = Column(BigInteger, nullable=False)
+    name_user = Column(Text, nullable=True)
 
     users: Mapped['Users'] = relationship(back_populates='blacklist', uselist=False)
 
@@ -82,6 +84,7 @@ class LikedList(basic):
     id = Column(BigInteger, primary_key=True)
     id_user = Column(BigInteger, ForeignKey('users.id_vk', ondelete='CASCADE'))
     id_like_user = Column(BigInteger, nullable=False)
+    name_user = Column(Text, nullable=True)
 
     users: Mapped['Users'] = relationship(back_populates='likedlist', uselist=False)
 
