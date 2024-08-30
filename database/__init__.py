@@ -3,8 +3,6 @@ from sqlalchemy.orm import sessionmaker
 import sqlalchemy
 
 
-print('___start packet database___')
-
 data_bd = DATABASES['postgresql']
 PATH = (f"{data_bd['NAME']}://{data_bd['USER']}:{data_bd['PASSWORD']}@"
         f"{data_bd['HOST']}:{data_bd['PORT']}/{data_bd['BD_NAME']}")

@@ -1,19 +1,22 @@
+from settings import VK_VERSION
 import requests
 
 
 class SearchVK:
-    def __init__(self, token_api_vk, version='5.199'):
+    def __init__(self, token_api_vk):
         self.basic_url = 'https://api.vk.com/method/'
-        self.params = {'access_token': token_api_vk, 'v': version}
+        self.params = {'access_token': token_api_vk, 'v': VK_VERSION}
 
     def get_user_vk(self, user_id):
         params = {'user_ids': user_id,
                   'fields': 'screen_name, sex, city, relation, activities, about, bdate, interests, music, activities'}
 
         try:
-            response = requests.get(self.basic_url + 'users.get', params={**params, **self.params}).json()['response'][0]
+            response = requests.get(self.basic_url + 'users.get',
+                                    params={**params, **self.params}).json()['response'][0]
         except KeyError:
-            return 'Токен недоступен. Слишком много запросов или нужно заново авторизироваться'
+            print('Токен недоступен')
+            return 'Токен недоступен. Слишком много запросов или нужно заново авторизоваться'
         city = response.pop('city')
         id_user = response.pop('id')
         return {'city_title': city['title'], 'id_user': id_user, **response, 'city_id': city['id']}
@@ -54,5 +57,5 @@ class SearchVK:
                     'likes': photo['likes']['count'],
                 }
             return list_photos
-        except KeyError as e:
+        except KeyError:
             return -1
