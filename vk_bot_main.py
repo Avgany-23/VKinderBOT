@@ -1,15 +1,15 @@
-from database.crud_db.black_list import BlackListBD
-from database.crud_db.liked_list import LikedListBD
-from database.crud_db.search_people import SearchPeopleBd
 from database.requests_redis import redis_clear_user_id, redis_set_person, redis_set_current_person, \
     redis_save_history, redis_browsing_history, redis_person_is_current, redis_get_next_person, redis_get_person_info, \
     redis_get_prev_person
 from vk_bot.bot_function import get_message_search, save_search_people, send_message, list_users, change_filter_age, \
     change_filter_sex, change_filter_status, change_filter_city, snow_snackbar, user_filters
-from vk_bot.menu_button import search_inline, filters_menu, main_menu, like_block_list
 from vk_bot.utils import decorator_check_users_or_create_him, message_status, message_city
-from settings import TOKEN_BOT, GROUP_ID_VK, HISTORY_SIZE
+from vk_bot.menu_button import search_inline, filters_menu, main_menu, like_block_list
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from database.crud_db.search_people import SearchPeopleBd
+from settings import TOKEN_BOT, GROUP_ID_VK, HISTORY_SIZE
+from database.crud_db.black_list import BlackListBD
+from database.crud_db.liked_list import LikedListBD
 from vk_api import VkApi
 import json
 import re
@@ -34,12 +34,12 @@ def vk_bot_main():
                 # ------ Кнопка "Найти половинку" ------
                 if pay_load_type == 'search_people':
                     redis_clear_user_id(id_user)  # Очистка прежнего кеша пользователя
-                    decorator_check_users_or_create_him(id_user)(save_search_people)(id_user)
-                    info_user = get_message_search(id_user)
-                    redis_set_person(id_user, info_user)
-                    redis_set_current_person(id_user, info_user['id_user'])
-                    redis_save_history(id_user, info_user, size=HISTORY_SIZE)  # Сохранение в историю анкет Redis
-                    SearchPeopleBd().delete_user(id_user, info_user['id_user'])  # Удаление прошлой записи
+                    decorator_check_users_or_create_him(id_user)(save_search_people)(id_user)   # Инициализация user
+                    info_user = get_message_search(id_user)                         # Поиск людей
+                    redis_set_person(id_user, info_user)                            # Установка анкеты в Redis
+                    redis_set_current_person(id_user, info_user['id_user'])         # Установка текущей анкеты в Redis
+                    redis_save_history(id_user, info_user, size=HISTORY_SIZE)       # Сохранение в историю анкет Redis
+                    SearchPeopleBd().delete_user(id_user, info_user['id_user'])     # Удаление прошлой записи из PostSQL
                     send_message(vk=vk, user_id=id_user,
                                  message=info_user['message'],
                                  attachment=info_user['attachment'],
@@ -106,9 +106,8 @@ def vk_bot_main():
 
         # Событие на нажатия callback кнопок
         if event.type == VkBotEventType.MESSAGE_EVENT:
-            callback = event.object.payload.get('type')  # действие callback
-            id_user = event.object.user_id  # id пользователя
-
+            callback = event.object.payload.get('type')     # действие callback
+            id_user = event.object.user_id                  # id пользователя
 
             # ------ События на переход по ссылке ------
             if callback == 'open_link':
@@ -136,18 +135,18 @@ def vk_bot_main():
                 # ------ Если текст всплывающего сообщения содержит слово "удален" или "добавлен" ------
                 if 'удален' in mess_payload or 'добавлен' in mess_payload:
                     name_user = info_user['message'][info_user['message'].find(':') + 2:info_user['message'].find('\n')]
-                    if mess_payload.find('черный список') > 0:  # Добавление в BlackList
+                    if mess_payload.find('черный список') > 0:                              # Добавление в BlackList
                         BlackListBD().add_user_black_list(id_user,
                                                           info_user['id_user'],
                                                           name_user)
-                    if mess_payload.find('список избранного') > 0:  # Добавление в LikedList
+                    if mess_payload.find('список избранного') > 0:                          # Добавление в LikedList
                         LikedListBD().add_like_user(id_user,
                                                     info_user['id_user'],
                                                     name_user)
-                    if mess_payload.find('из черного списка') > 0:  # Удаление из BlackList
+                    if mess_payload.find('из черного списка') > 0:                          # Удаление из BlackList
                         BlackListBD().delete_user_black_list(id_user,
                                                              info_user['id_user'])
-                    if mess_payload.find('из списка избранного') > 0:  # Удаление из BlackList
+                    if mess_payload.find('из списка избранного') > 0:                       # Удаление из BlackList
                         LikedListBD().delete_like_user(id_user,
                                                        info_user['id_user'])
 
@@ -165,16 +164,16 @@ def vk_bot_main():
 
                 # --- Если следующей анкеты нет в кеше Redis, то достать данные из PostgresSQL ---
                 if redis_person_is_current(id_user):
-                    save_search_people(id_user)  # Сохранение людей, если их нет
-                    info_user = get_message_search(id_user)  # Информацию о первой найденной анкете
-                    redis_save_history(id_user, info_user, size=HISTORY_SIZE)  # Сохранение в историю анкет Redis
-                    SearchPeopleBd().delete_user(id_user, info_user['id_user'])  # Удаление прошлой записи
-                    redis_set_person(id_user, info_user)  # Сохранить анкету в кэш
+                    save_search_people(id_user)                                   # Сохранение людей, если их нет
+                    info_user = get_message_search(id_user)                       # Информацию о первой найденной анкете
+                    redis_save_history(id_user, info_user, size=HISTORY_SIZE)     # Сохранение в историю анкет Redis
+                    SearchPeopleBd().delete_user(id_user, info_user['id_user'])   # Удаление прошлой записи
+                    redis_set_person(id_user, info_user)                          # Сохранить анкету в кэш
                     redis_set_current_person(id_user, info_user['id_user'])  # Установить текущую просматриваемую анкету
 
                 # --- Если в Redis есть информация о следующей анкете, то информация о человеке берётся из Redis ---
                 else:
-                    info_user = redis_get_next_person(id_user)  # Информация об анкете
+                    info_user = redis_get_next_person(id_user)               # Информация об анкете
                     redis_set_current_person(id_user, info_user['id_user'])  # Установить текущую просматриваемую анкету
 
                 # Предыдущая анкета изменяется на новую анкету с текущими данными

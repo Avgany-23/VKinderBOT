@@ -17,6 +17,7 @@ def decorator_check_users_or_create_him(id_vk: int):
                 user_info = vk_user.get_user_vk(id_vk)
                 InfoUsersBd().add_info_users(**user_info)
                 UsersFiltersBd().add_filters_users(**format_for_filters_users(user_info))
+                # ТУТ ЛОГ второго уровня
             return func(*args, **kwargs)
         return wrapper
     return decorator

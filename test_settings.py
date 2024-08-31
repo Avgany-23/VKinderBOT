@@ -18,7 +18,7 @@ DATABASES_TEST = {
         'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '5432',
-        'BD_NAME': 'vk_test2',
+        'BD_NAME': 'vk_test',
     },
     'redis': {
         'host': 'localhost',
