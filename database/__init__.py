@@ -16,7 +16,7 @@ def session_bd(path: str) -> sessionmaker:
 class Session:
     table = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = session_bd(PATH)
 
     def get_all(self) -> iter:

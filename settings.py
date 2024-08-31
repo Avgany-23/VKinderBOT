@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import json
 import os
 
 
@@ -19,16 +20,7 @@ VK_VERSION = '5.199'
 # Размер кеша для сохранения истории просмотров анкет
 HISTORY_SIZE = 15
 
-# Для Telegram Бота (отправка логов). По умолчанию выключен - include = False. include = True - включить
-tg_bot = {
-    'include': False,
-    'data': {
-        'token': '',
-        'login': '',
-        'password': ''
-    }
-}
-
+# Базы данных
 DATABASES = {
     'postgresql': {
         'NAME': 'postgresql',
@@ -45,4 +37,21 @@ DATABASES = {
         'decode_responses': True,
         'charset': "utf-8",
     }
+}
+
+# Для Telegram Бота (отправка логов). По умолчанию выключен - include = False. include = True - включить
+tg_bot = {
+    'include': True,    # True - бот работает (нужны будут данные к нему из файла .env), False - выключен
+    'data': {
+        'token': os.getenv('bot_tg'),
+        'login': '1234',
+        'password': '1234',
+        'main_user_tg_id': os.getenv('send_id_main'),
+        'all_ids_user': [os.getenv('send_id_main')] + json.loads(os.getenv('send_id'))
+    },
+    'send_times': [
+        '12:00',
+        '20:00',
+        '00:00',
+    ]
 }
