@@ -55,11 +55,12 @@ def snow_snackbar(vk: VkApi, event_id: str, user_id: int, peer_id: int, event_da
 
 def list_users(id_vk: int, list_user: str = 'Like list') -> str:
     """
-    Возвращает count пользователей из БД.
+    Возвращает  пользователей из БД.
     list_user: like_pages - из таблицы LikedList, block_pages - из таблицы BlackList
     """
 
     query = LikedListBD() if list_user == 'like list' else BlackListBD()
+
     result = query.get_all_users(id_vk)
 
     if list_user == 'like list':
@@ -160,6 +161,7 @@ def get_message_search(id_vk: int) -> dict:
     search = SearchVK(VK_KEY_API)
     user_info = search.get_user_vk(user[1])
     attachment = get_id_vk_users_photo(user_info['id_user'])
+
     return {
         'message': f"Имя: {user_info['first_name']} {user_info['last_name']}\n"
                    f"Возраст: {calculate_age(user_info['bdate'])}\n"

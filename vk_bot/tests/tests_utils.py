@@ -1,6 +1,5 @@
-from .. utils import (
+from vk_bot.utils import (
     choose_plural,
-    decorator_check_users_or_create_him,
     calculate_age,
     filter_age,
     format_for_filters_users,
@@ -30,13 +29,8 @@ class TestChoosePlural(unittest.TestCase):
     def test_type_params(self):
         self.assertRaises(TypeError, choose_plural, '1', ('яблоко', 'яблока', 'яблок'))
 
-    @unittest.expectedFailure
     def test_none(self):
-        self.assertIsNone(choose_plural(1, ('яблоко', 'яблока', 'яблок')))
-
-
-class TestDecoratorCheckUsersOrCreateHim(unittest.TestCase):
-    ...
+        self.assertIsNotNone(choose_plural(1, ('яблоко', 'яблока', 'яблок')))
 
 
 class TestFiltersFunc(unittest.TestCase):
