@@ -29,9 +29,8 @@ class TestChoosePlural(unittest.TestCase):
     def test_type_params(self):
         self.assertRaises(TypeError, choose_plural, '1', ('яблоко', 'яблока', 'яблок'))
 
-    @unittest.expectedFailure
     def test_none(self):
-        self.assertIsNone(choose_plural(1, ('яблоко', 'яблока', 'яблок')))
+        self.assertIsNotNone(choose_plural(1, ('яблоко', 'яблока', 'яблок')))
 
 
 class TestFiltersFunc(unittest.TestCase):

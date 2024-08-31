@@ -1,6 +1,5 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text, create_engine
-from database import PATH
 from database.models import basic
 import sqlalchemy
 
@@ -14,6 +13,7 @@ def create_object_db(path: str) -> tuple[int, None] | tuple[int, str]:
     try:
         with sqlalchemy.create_engine(for_create_path, isolation_level='AUTOCOMMIT').connect() as connection:
             connection.execute(text(f'CREATE DATABASE {for_create_db}'))
+        print(f'База данных {for_create_db} успешно создалась')
         return 1, None
     except (sqlalchemy.exc.OperationalError, UnicodeDecodeError) as e:
         return -1, e
@@ -50,13 +50,32 @@ def create_bd(info_path: str) -> None:
     session.commit(), session.close()   # Коммит и закрытие сессии
 
 
-if __name__ == '__main__':
+def delete_object_db(path: str):
+    """Удаление Базы Данных по пути path"""
+    for_delete_path = path[:path.rfind('/')]
+    for_delete_db = path[path.rfind('/') + 1:]
+
+    try:
+        with sqlalchemy.create_engine(for_delete_path, isolation_level='AUTOCOMMIT').connect() as connection:
+            connection.execute(text(f'DROP DATABASE IF EXISTS {for_delete_db} WITH (FORCE);'))
+        return 1, None
+    except (sqlalchemy.exc.OperationalError, UnicodeDecodeError) as e:
+        return -1, e
+
+
+def create_bd_and_tables_if_not_exists():
+    from database import PATH
+
     # --- Создание Базы Данных и таблиц в ней ---
     create_bd_ = create_object_db(PATH)
     if create_bd_[0] == -1:
         print('Создание Базы Данных не произошло. Неправильно указаны настройки к подключению')
     elif create_bd_[0] == -2:
-        print('Созданы Базы данных не произошло. База данных с таким именем уже существует')
-    if check_bd(PATH):
-        create_bd(PATH)   # Создание БД
+        print(f'Созданы Базы данных не произошло. База данных с именем  {PATH[PATH.rfind("/") + 1:]}  уже существует')
+    try:
+        check_bd(PATH)      # Проверка наличия таблиц в БД
+    except SystemExit as e:
+        print(e)
+    else:
+        create_bd(PATH)     # Создание таблиц в БД
         print('База данных и таблицы успешно созданы')

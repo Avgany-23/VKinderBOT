@@ -6,7 +6,7 @@ from database import session_bd, PATH
 
 
 def main_menu(id_vk) -> VkKeyboard:
-    """Inline клавиатура главного меню"""
+    """Клавиатура главного меню"""
     keyboard = VkKeyboard(one_time=False)
     keyboard.add_button(label='Найти половинку 💙',
                         color=VkKeyboardColor.SECONDARY,
@@ -93,7 +93,7 @@ def search_inline(url_profile: str, id_vk: int, user_list_id: int, prev_none: bo
 
     # --- Проверка на наличие человека в списке Избранного/ЧС для выбора подходящей кнопки ---
     session = session_bd(PATH)
-    with (session() as sess):
+    with session() as sess:
         check_lists_result = (sess.query(Users.id_vk, LikedList.id_like_user, BlackList.id_ignore_user).
                               join(BlackList, Users.id_vk == BlackList.id_user).
                               outerjoin(LikedList, Users.id_vk == LikedList.id_user).

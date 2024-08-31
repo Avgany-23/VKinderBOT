@@ -4,8 +4,6 @@ import sqlalchemy
 
 
 data_bd = DATABASES['postgresql']
-# data_bd = DATABASES_TEST['postgresql']
-
 PATH = (f"{data_bd['NAME']}://{data_bd['USER']}:{data_bd['PASSWORD']}@"
         f"{data_bd['HOST']}:{data_bd['PORT']}/{data_bd['BD_NAME']}")
 
