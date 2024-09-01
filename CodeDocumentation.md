@@ -55,23 +55,15 @@
 - get_user_vk(self, user_id: int) - возвращает информацию о пользователе в ВК по его user_id. Функция вернёт словарь с информацией, если она найдется, или строчку, если с токен от АПИ ВК по каким-либо причинам станет недоступен;
 - get_users_vk(count: int = 1000, **kwargs) - метод находит count пользователей в вк (по умолчанию 1000) по указанным фильтрам в kwargs. В работе программы используются следующие фильтры:
   
-1)sex: int (1 or 2)
-
-2)city: int,
-
-3)online: int (1 or 2),
-
-4)age_from: int,
-
-5)age_to: int,
-
-6)has_photo: int (0 or 1),
-
-7)is_closed: bool,
-
-8)fields: str,
-
-9)is_closed: boole.
+1)sex: int (1 or 2);
+2)city: int;
+3)online: int (1 or 2);
+4)age_from: int;
+5)age_to: int;
+6)has_photo: int (0 or 1);
+7)is_closed: bool;
+8)fields: str;
+9)is_closed: boole;
 
 - get_photo_user(self, user_id: int, place='profile', max_count: int = 5) - метод, по указанному user_id, достает от 0 до max_count (по умолчанию до 5) фотографий с профиля (place='profile') или со стены (place='wall') пользователя. Возвращает словарь с id фотографиями и дополнительной информацией о них. Вернёт -1, если при взятии фотографий не обнаружится какой-либо информации, например, ссылки на фотографию, количество лайков и т.д.
 
