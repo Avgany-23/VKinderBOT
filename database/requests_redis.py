@@ -136,20 +136,3 @@ def redis_browsing_history(id_user: int, connect: redis.StrictRedis = redis_conn
     people = '\n'.join(f"{i}){person['message']}"
                        f"Ссылка: {person['url_profile']}\n" for i, person in enumerate(history, 1))
     return f"Ваша история просмотров последних {len(history)} записей:\n{people}"
-
-
-def redis_info_user(id_user: int,
-                    info: dict,
-                    action: str = 'save',
-                    connect: redis.StrictRedis = redis_connect()) -> None | dict:
-    """Сохраняет и изымает информацию о текущей анкете"""
-
-    key = f'info_user_vk_{id_user}'
-    if action == 'save':
-        connect.set(key, json.dumps(info))
-        connect.close()
-        return None
-    else:
-        result = json.loads(connect.get(key))
-        connect.close()
-        return result
