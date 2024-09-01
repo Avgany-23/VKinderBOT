@@ -65,7 +65,7 @@ def delete_object_db(path: str):
         return -1, e
 
 
-def create_bd_and_tables_if_not_exists():
+def create_bd_and_tables_if_not_exists() -> int:
     from database import PATH
 
     # --- Создание Базы Данных и таблиц в ней ---
@@ -73,7 +73,6 @@ def create_bd_and_tables_if_not_exists():
     if create_bd_[0] == -1:
         print('Создание Базы Данных не произошло. Неправильно указаны настройки к подключению')
         return -3
-        # Тут поставить лог 3 уровня
     elif create_bd_[0] == -2:
         print(f'Созданы Базы данных не произошло. База данных с именем  {PATH[PATH.rfind("/") + 1:]}  уже существует')
     try:
@@ -90,4 +89,3 @@ def create_bd_and_tables_if_not_exists():
         redis_connect().flushdb()           # Если всё создано успешно, что весь кеш из Редиса очищается
         print('База данных и таблицы успешно созданы, кеш в Redis очищен.')
         return 1
-        # Тут поставить лог 1 уровня
