@@ -40,7 +40,7 @@ DATABASES = {
 
 # Для Telegram Бота (отправка логов). По умолчанию выключен - include = False. include = True - включить
 tg_bot = {
-    'include': True,    # True - бот работает (нужны будут данные к нему из файла .env), False - выключен
+    'include': False,    # True - бот работает (нужны будут данные к нему из файла .env), False - выключен
     'data': {
         'token': os.getenv('bot_tg'),
         'login': '1234',
