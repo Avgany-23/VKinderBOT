@@ -15,6 +15,8 @@
 
 ![image](https://github.com/user-attachments/assets/01b06f31-ea72-4372-a1b4-c2cc3dd56093)
 
+Получение ВК токенов и настройка ВК бота описана ниже в файле.
+
 4) Настройка postgreSQL и Redis:
    - установка редиса - [ссылка](https://habr.com/ru/articles/821363/)
    - установка PostgreSQL - [ссылка](https://tproger.ru/articles/osnovy-postgresql-dlya-nachinayushhih--ot-ustanovki-do-pervyh-zaprosov-250851)
