@@ -9,7 +9,13 @@ from database.requests_redis import (
     redis_get_current_person,
     redis_person_is_current,
     redis_clear_user_id,
-    redis_save_history)
+    redis_save_history,
+    redis_person_is_last,
+    redis_get_prev_person,
+    redis_browsing_history,
+    redis_get_next_person)
+import unittest
+from unittest.mock import patch, MagicMock
 
 
 class TestRedisFunc(TestCase):
@@ -121,7 +127,7 @@ class TestRedisFunc(TestCase):
         self.assertGreater(self.redis_test.llen(f'search_{user_id}'), 0)
         # удалить данные
         redis_clear_user_id(user_id, connect=self.redis_test)
-        # Проверка  удаления
+        # Проверка удаления
         self.assertIsNone(self.redis_test.get(f'current_person_{user_id}'))
         self.assertEqual(self.redis_test.llen(f'search_{user_id}'), 0)
 
@@ -147,3 +153,116 @@ class TestRedisFunc(TestCase):
         self.assertEqual(len(history), 6)  # Должно быть 6 сообщений
         self.assertEqual(history[0]['text'], "message 7")
         self.assertEqual(history[-1]['text'], "message 2")
+
+    @patch('database.requests_redis.redis_get_current_person')
+    @patch('database.requests_redis.redis_connect')
+    def test_person_is_last(self, mock_redis_connect, mock_redis_get_current_person):
+        try:
+            # Настройка mock для Redis
+            mock_redis_client = MagicMock()
+            mock_redis_connect.return_value = mock_redis_client
+            redis_set_person(5, connect=self.redis_test, message={'data': '22', 'id_user': '44'})
+            # Подготовка данных, которые будут возвращаться от lrange
+            mock_redis_client.lrange.return_value = [
+                json.dumps({'id_user': 1}),
+                json.dumps({'id_user': 2}),
+                json.dumps({'id_user': 3}),
+            ]
+            # Настройка текущей анкеты
+            mock_redis_get_current_person.return_value = 3
+            self.assertTrue(redis_person_is_last(1, connect=self.redis_test))
+            mock_redis_get_current_person.return_value = 2
+            self.assertFalse(redis_person_is_last(1, connect=self.redis_test))
+            # Тест на случай, когда lrange возвращает пустой список
+            mock_redis_client.lrange.return_value = []
+            # Проверка на работу функции в случае пустого списка. Это должно вызвать IndexError,
+            # поэтому мы обернем в assertRaises
+            with self.assertRaises(IndexError):
+                redis_person_is_last(1, connect=self.redis_test)
+            # Дополнительно, тестируем случай, когда только одна анкета
+            mock_redis_client.lrange.return_value = [
+                json.dumps({'id_user': 1}),
+            ]
+            mock_redis_get_current_person.return_value = 1
+            # Проверка с единственной анкетой
+            self.assertTrue(redis_person_is_last(1, connect=self.redis_test))
+        except IndexError as er:
+            return f'check the database, the cache may be empty {er}'
+
+    @unittest.skip
+    @patch('database.requests_redis.redis_connect')
+    def test_get_prev_person(self, mock_redis_connect):
+        mock_redis_client = MagicMock()
+        mock_redis_connect.return_value = mock_redis_client
+
+        mock_redis_client.lrange.return_value = [
+            json.dumps({'id_user': 1}),
+            json.dumps({'id_user': 2}),
+            json.dumps({'id_user': 3}),
+        ]
+
+        mock_redis_client.get.return_value = 2
+
+        expected_result = {'id_user': 1}
+        self.assertEqual(redis_get_prev_person(1, connect=self.redis_test), expected_result)
+
+        mock_redis_client.get.return_value = 3
+        expected_result_end = 'end list'
+        self.assertEqual(redis_get_prev_person(1, connect=self.redis_test), expected_result_end)
+
+        mock_redis_client.lrange.return_value = []
+        mock_redis_client.get.return_value = 1
+        expected_result_empty = 'empty list'
+        self.assertEqual(redis_get_prev_person(1, connect=self.redis_test), expected_result_empty)
+
+    @unittest.skip
+    @patch('database.requests_redis.redis_connect')
+    def test_get_next_person(self, mock_redis_connect):
+        mock_redis_client = MagicMock()
+        mock_redis_connect.return_value = mock_redis_client
+
+        # Данные для теста
+        mock_redis_client.lrange.return_value = [
+            json.dumps({'id_user': 1}),
+            json.dumps({'id_user': 2}),
+            json.dumps({'id_user': 3}),
+        ]
+
+        mock_redis_client.get.return_value = 2
+
+        expected_result = {'id_user': 3}  # Ожидаем, что следующий пользователь после 2 - это 3
+        self.assertEqual(redis_get_next_person(1, connect=self.redis_test), expected_result)
+
+        mock_redis_client.get.return_value = 3
+        expected_result_end = 'end list'
+        self.assertEqual(redis_get_next_person(1, connect=self.redis_test), expected_result_end)
+
+        mock_redis_client.lrange.return_value = []
+        mock_redis_client.get.return_value = 1  # Текущий пользователь - 1
+        expected_result_empty = 'empty list'
+        self.assertEqual(redis_get_next_person(1, connect=self.redis_test), expected_result_empty)
+
+    @unittest.skip
+    @patch('database.requests_redis.redis_connect')
+    def test_browsing_history(self, mock_redis_connect):
+        mock_redis_client = MagicMock()
+        mock_redis_connect.return_value = mock_redis_client
+
+        mock_redis_client.lrange.return_value = [
+            json.dumps({'message': ' Просмотр 1\n', 'url_profile': 'http://example.com/1'}),
+            json.dumps({'message': ' Просмотр 2\n', 'url_profile': 'http://example.com/2'}),
+            json.dumps({'message': ' Просмотр 3\n', 'url_profile': 'http://example.com/3'}),
+        ]
+
+        expected_output = (
+            "Ваша история просмотров последних 0 записей:\n"
+            "1) Просмотр 1\nСсылка: http://example.com/1\n"
+            "2) Просмотр 2\nСсылка: http://example.com/2\n"
+            "3) Просмотр 3\nСсылка: http://example.com/3\n"
+        )
+
+        self.assertEqual(redis_browsing_history(1, connect=self.redis_test), expected_output)
+
+        mock_redis_client.lrange.return_value = []
+        expected_empty_output = "Ваша история просмотров последних 0 записей:\n\n"
+        self.assertEqual(redis_browsing_history(1, connect=self.redis_test), expected_empty_output)

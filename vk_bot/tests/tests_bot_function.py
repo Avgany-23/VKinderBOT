@@ -6,7 +6,7 @@ from test_settings import (TOKEN_BOT_TEST,
                            test_BlackListBD,
                            test_LikedListBD,
                            test_UsersBd)
-from function_for_test import list_users_test, test_connect_vk_bot, test_create_bd
+from vk_bot.tests.function_for_test import list_users_test, test_connect_vk_bot, test_create_bd
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_bot.bot_function import send_message
 from vk_bot import bot_function
@@ -31,10 +31,10 @@ create_bd_status = test_create_bd(PATH_TEST_POSTGRESQL)
 
 
 def tearDownModule():
-    if create_bd_status:
-        result = delete_object_db(PATH_TEST_POSTGRESQL)
-        if result[0] == - 1:
-            print(f'БД не удалена\n{result[1]}')
+    # if create_bd_status:
+    result = delete_object_db(PATH_TEST_POSTGRESQL)
+    if result[0] == - 1:
+        print(f'БД не удалена\n{result[1]}')
 
 
 class TestMainFunction(unittest.TestCase):

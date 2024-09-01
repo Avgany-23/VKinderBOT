@@ -29,13 +29,15 @@ def test_create_bd(path: str) -> bool:
     result_db = create_object_db(path)
     if result_db[0] != 1:
         create_bd_status = False
-        print(f'База данных не создана {create_bd_status=}. Часть функций протестирована не будет')
+        print(f'База данных не создана {create_bd_status=}. Часть функций протестирована не будет\n'
+              f'Перезапустите тест. Если не поможет, проверьте правильность тестовых данных в файле .env')
     else:
         try:
             check_bd(path)
         except SystemError:
             create_bd_status = False
-            print(f'Таблицы не созданы {create_bd_status=}. Часть функций протестирована не будет')
+            print(f'Таблицы не созданы {create_bd_status=}. Часть функций протестирована не будет\n'
+                  f'Перезапустите тест. Если не поможет, проверьте правильность тестовых данных в файле .env')
         else:
             create_bd(path)
     return create_bd_status

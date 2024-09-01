@@ -37,7 +37,7 @@ PATH_TEST_POSTGRESQL = (f"{DT_POSTGRESQL['NAME']}://{DT_POSTGRESQL['USER']}:{DT_
 TOKEN_BOT_TEST = os.getenv('token_bot_test')
 
 # ID группы ВК, в которой находится БОТ:
-GROUP_ID_VK_TEST = int(os.getenv('group_id_test'))
+GROUP_ID_VK_TEST = os.getenv('group_id_test') if os.getenv('group_id_test') else 0
 
 # Токен от VK-API:
 VK_KEY_API_TEST = os.getenv('vk_api_key_test')

@@ -13,11 +13,18 @@ def decorator_check_users_or_create_him(id_vk: int):
         def wrapper(*args, **kwargs):
             create_user = UsersBd().create_user(id_vk)
             if create_user:  # Если пользователь создался, значит надо инициализировать его в InfoUsers и FiltersUsers
+                from logs.logs import logger_base
+
                 vk_user = SearchVK(VK_KEY_API)
                 user_info = vk_user.get_user_vk(id_vk)
-                InfoUsersBd().add_info_users(**user_info)
+                result_create_user = InfoUsersBd().add_info_users(**user_info)
+                if result_create_user == 1:
+                    logger_base.info(f'Пользователь с vk_id = {id_vk} успешно создался')
+                else:
+                    logger_base.error(f'Пользователь с vk_id = {id_vk} не создался. Проверьте '
+                                      f'InfoUsersBd().add_info_users')
                 UsersFiltersBd().add_filters_users(**format_for_filters_users(user_info))
-                # ТУТ ЛОГ второго уровня
+
             return func(*args, **kwargs)
         return wrapper
     return decorator

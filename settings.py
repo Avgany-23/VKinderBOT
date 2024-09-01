@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import json
 import os
 
 
@@ -9,7 +8,7 @@ load_dotenv()
 TOKEN_BOT = os.getenv('token_bot')
 
 # ID группы ВК, в которой находится БОТ:
-GROUP_ID_VK = int(os.getenv('group_id'))
+GROUP_ID_VK = os.getenv('group_id')
 
 # Токен от VK-API:
 VK_KEY_API = os.getenv('vk_api_key')
@@ -46,12 +45,11 @@ tg_bot = {
         'token': os.getenv('bot_tg'),
         'login': '1234',
         'password': '1234',
-        'main_user_tg_id': os.getenv('send_id_main'),
-        'all_ids_user': [os.getenv('send_id_main')] + json.loads(os.getenv('send_id'))
     },
+    # Время указывается в формате HH:MM без секунд для корректной отправки уведомлений
     'send_times': [
         '12:00',
-        '20:00',
-        '00:00',
+        '21:07',
+        '02:00',
     ]
 }

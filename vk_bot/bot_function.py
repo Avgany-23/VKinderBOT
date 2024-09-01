@@ -11,7 +11,7 @@ from settings import VK_KEY_API
 from typing import Optional
 from random import shuffle
 from vk_api import VkApi
-from .utils import (
+from vk_bot.utils import (
     choose_plural,
     calculate_age,
     message_status,
