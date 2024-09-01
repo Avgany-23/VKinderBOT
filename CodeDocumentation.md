@@ -99,4 +99,22 @@
 
 ![image](https://github.com/user-attachments/assets/11818c3d-a667-4518-aea4-5389dfc86032)
 
+5) Модуль requests_redis.py - Модуль содержит в себе функции для работы с Redis, позволяющие записывать в кэш различную информацию под каждого пользователя VK:
+
+- redis_connect(path, charset_) - функция подключается в Redis и используется в последующих функциях данного модуля в качестве аргумента connect. По умолчанию имеет path тот, что указан в настройках settings.py к Редису. Возвращает объект redis.StrictRedis;
+- redis_set_person(id_user, message, connect) - по ключу ```search_{id_user}``` записывает словарь message в список Redis. Функция ничего не возвращает;
+- redis_set_current_person(id_user, id_search_user, connect) - функция ничего не возвращает. Устанавливает в кеше информацию о ток анкете, на который находится в текущий момент пользователь. Запись идет по ключу ```current_person_{id_user}```;
+- redis_get_current_person(id_user, connect) - функция возвращает записанную строку функцией redis_set_current_person;
+- redis_get_person_info(id_user, connect) - функция возвращает записанный словарь функцией redis_set_person;
+- redis_get_person_current_info(id_user, connect) - функция получает словарь message (который записывается в redis_set_person) той анкеты, на которой в текущий момент находится пользователь в списке Redis по ключу ```search_{id_user}```;
+- redis_person_is_current(id_user, connect) - функция проверяет, находится ли пользователь на текущей анкете в списке Redis по ключу ```search_{id_user}```. Возвращает bool значение;
+- redis_person_is_last(id_user, connect) - функция проверяет, находится ли пользователь на последней анкете в списке Redis по ключу ```search_{id_user}```;
+- redis_get_prev_person(id_user, connect) - функцию достается список Redis по ключу ```search_{id_user}``` и перемещает текущее значение анкеты на 1 шаг назад за счет функции redis_set_current_person();
+- redis_get_next_person(id_user, connect) - функция аналогична предыдущей функции, только перемещает значение на 1 шаг вперёд;
+- redis_clear_user_id(id_user, connect) - функция очищает кеш по ключу ```'current_person_{id_user}'``` и ```search_{id_user}```;
+- redis_save_history(id_user, message, size, connect) - функция записывает в список Redis по ключу ```history_{id_user}``` информацию в словаре message о просматриваемых анкетах. Максимальное количество записей = size (по умолчанию 15). Если записывается запись в тот момент, когда в списке уже 15 записей, то та запись, которая была записана раньше всех - удаляется;
+- redis_browsing_history(id_user, connect) - функция возвращает записанный message из функции redis_save_history по ключу ```history_{id_user}```;
+- 
+
+
 
