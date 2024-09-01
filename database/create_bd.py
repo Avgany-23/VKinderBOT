@@ -59,6 +59,7 @@ def delete_object_db(path: str):
     try:
         with sqlalchemy.create_engine(for_delete_path, isolation_level='AUTOCOMMIT').connect() as connection:
             connection.execute(text(f'DROP DATABASE IF EXISTS {for_delete_db} WITH (FORCE);'))
+            connection.commit()
         return 1, None
     except (sqlalchemy.exc.OperationalError, UnicodeDecodeError) as e:
         return -1, e
@@ -71,18 +72,22 @@ def create_bd_and_tables_if_not_exists():
     create_bd_ = create_object_db(PATH)     # Создание Базы данных
     if create_bd_[0] == -1:
         print('Создание Базы Данных не произошло. Неправильно указаны настройки к подключению')
+        return -3
         # Тут поставить лог 3 уровня
     elif create_bd_[0] == -2:
         print(f'Созданы Базы данных не произошло. База данных с именем  {PATH[PATH.rfind("/") + 1:]}  уже существует')
-        # Тут поставить лог 2 уровня
     try:
         check_bd(PATH)                      # Проверка наличия таблиц в БД
     except SystemExit as e:
         print(e)
-        # Тут поставить лог 2 уровня
+        if create_bd_[0] == 1:
+            return -2
+        if create_bd_[0] == -2:
+            return -1
     else:
 
         create_bd(PATH)                     # Создание таблиц в БД
         redis_connect().flushdb()           # Если всё создано успешно, что весь кеш из Редиса очищается
         print('База данных и таблицы успешно созданы, кеш в Redis очищен.')
+        return 1
         # Тут поставить лог 1 уровня

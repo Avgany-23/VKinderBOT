@@ -1,19 +1,19 @@
 from test_settings import PATH_TEST_POSTGRESQL, test_UsersBd, test_InfoUsersBd, test_LikedListBD, test_BlackListBD
-from ..create_bd import create_object_db, delete_object_db, create_bd
+from database.create_bd import create_object_db, delete_object_db, create_bd
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from database.models import basic
 from unittest import TestCase
+from tests_project.function_for_test import test_create_bd
+
 
 
 class TestUsersOperations(TestCase):
-    engine = create_engine(PATH_TEST_POSTGRESQL)
 
     @classmethod
     def setUpClass(cls):
-        """Создание ДатаБазы, Заливка таблиц, Создать 2х юзеров"""
-        create_object_db(PATH_TEST_POSTGRESQL)
-        create_bd(PATH_TEST_POSTGRESQL)
+        """Создание ДатаБазы, Заливка таблиц"""
+        test_create_bd(PATH_TEST_POSTGRESQL)
 
     @classmethod
     def tearDownClass(cls):
@@ -23,11 +23,14 @@ class TestUsersOperations(TestCase):
     def setUp(self):
         id_test_list = [100000, 2000000]
         for id_test in id_test_list:
-            test_UsersBd.create_user(id_test)
+            try:
+                test_UsersBd.create_user(id_test)
+            except:
+                test_UsersBd.create_user(id_test)
 
     def tearDown(self):
         metadata = basic().metadata
-        with sessionmaker(bind=self.engine)() as session:
+        with sessionmaker(bind=create_engine(PATH_TEST_POSTGRESQL))() as session:
             for table in reversed(metadata.sorted_tables):
                 session.execute(table.delete())
             session.commit()

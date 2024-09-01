@@ -105,14 +105,16 @@ def bot_notification_tg() -> None:
         """Функция для отправки уведомлений"""
 
         test_critical_error = 'В программе обнаружены критические ошибки❗️❗️❗️❗️❗️\nФайл с ними отправлен ниже'
-        text_base_message = 'Отправка логов программы'
+        test_base_message = 'Отправка логов программы'
+        text_starts_program = 'Старт вк бота'
         [schedule.every().day.at(times).do(job_func=send_file,
                                            path='logs_base.log',
-                                           message=text_base_message) for times in send_times]
+                                           message=test_base_message) for times in send_times]
 
         while True:
             schedule.run_pending()
             send_file(path='logs_error.log', message=test_critical_error)
+            send_file(path='starts_program.log', message=text_starts_program)
             time.sleep(60)
 
     # Для параллельного запуска с ботом

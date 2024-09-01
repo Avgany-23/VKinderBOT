@@ -6,7 +6,7 @@ from test_settings import (TOKEN_BOT_TEST,
                            test_BlackListBD,
                            test_LikedListBD,
                            test_UsersBd)
-from vk_bot.tests.function_for_test import list_users_test, test_connect_vk_bot, test_create_bd
+from tests_project.function_for_test import test_create_bd, test_connect_vk_bot, list_users_test
 from vk_api.bot_longpoll import VkBotLongPoll
 from vk_bot.bot_function import send_message
 from vk_bot import bot_function
@@ -27,11 +27,13 @@ import vk_api
 test_go = test_connect_vk_bot(TOKEN_BOT_TEST, GROUP_ID_VK_TEST, VK_ID_TEST)
 message_reason_bd = ('Неправильно указаны данные для тестового бота\n'
                      'Проверьте правильность token_bot_test, group_id_test и id_vk_for_test')
-create_bd_status = test_create_bd(PATH_TEST_POSTGRESQL)
+
+
+def setUpModule():
+    create_bd_status = test_create_bd(PATH_TEST_POSTGRESQL)
 
 
 def tearDownModule():
-    # if create_bd_status:
     result = delete_object_db(PATH_TEST_POSTGRESQL)
     if result[0] == - 1:
         print(f'БД не удалена\n{result[1]}')
@@ -43,6 +45,7 @@ class TestMainFunction(unittest.TestCase):
     def setUpClass(cls):
         user = test_UsersBd
         another_user = [test_LikedListBD, test_BlackListBD]
+
         for id_ in range(1, 4):
             user.create_user(id_)
 
@@ -63,9 +66,7 @@ class TestMainFunction(unittest.TestCase):
             another_user[0].delete_like_all_user(id_)
             another_user[1].delete_black_all_user(id_)
 
-    @skipIf(not create_bd_status, 'База Данных не создана')
     def test_lists_user(self):
-        print(create_bd_status)
         info = {'name': ['Имя: Валера', 'Имя: Игорь', 'Имя: Света'],
                 'url': ['https://vk.com/id1', 'https://vk.com/id10', 'https://vk.com/id100']}
         for id_ in range(1, 4):
@@ -125,7 +126,7 @@ class TestSendMessages(unittest.TestCase):
     VkBotLongPoll(vk, GROUP_ID_VK_TEST)
 
     def setUp(self):
-        sleep(0.5)
+        sleep(0.1)
 
     @skipIf(not test_go, 'test_send_message\n' + message_reason_bd)
     def test_send_message_text(self):

@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, inspect
 from test_settings import PATH_TEST_POSTGRESQL
 
 
+
 class TestDatabaseCheckTablesAndCreateTables(TestCase):
     def tearDown(self):
         """За счет данного метода после всех тестов База данных будет удаляться"""

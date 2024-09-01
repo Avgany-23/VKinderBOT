@@ -46,9 +46,12 @@ def choose_plural(amount: int, declensions: tuple[str, str, str]) -> tuple[int, 
     return amount, declensions[selector[True]]
 
 
-def calculate_age(date_: str) -> int:
+def calculate_age(date_: str) -> int | str:
     """Определяет возраст человека (в годах). Принимает дату в формате d.m.y"""
-    birthday = datetime.strptime(date_, '%d.%m.%Y')
+    try:
+        birthday = datetime.strptime(date_, '%d.%m.%Y')
+    except ValueError:
+        return 'возраст не определён'
     today = datetime.now()
     return today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
 

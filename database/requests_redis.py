@@ -49,8 +49,17 @@ def redis_get_person_info(id_user: int, connect: redis.StrictRedis = redis_conne
     return list_keys[-1]
 
 
+def redis_get_person_current_info(id_user: int, connect: redis.StrictRedis = redis_connect()) -> dict:
+    """Получить полную информацию о текущем пользователе"""
+    redis_r = connect
+    current_person_indx = redis_r.get(f'current_person_{id_user}')
+    for people in [json.loads(i) for i in redis_r.lrange(f'search_{id_user}', 0, -1)]:
+        if people['id_user'] == int(current_person_indx):
+            return people
+
+
 def redis_person_is_current(id_user: int, connect: redis.StrictRedis = redis_connect()) -> bool:
-    """Проверить, находимся ли на последней анкете"""
+    """Проверить, находимся ли на текущей анкете"""
     redis_r = connect
     list_keys = [json.loads(i)['id_user'] for i in redis_r.lrange(f"search_{id_user}", 0, -1)]
     try:
@@ -67,6 +76,7 @@ def redis_person_is_last(id_user: int, connect: redis.StrictRedis = redis_connec
 
 
 def redis_get_prev_person(id_user: int, connect: redis.StrictRedis = redis_connect()) -> dict | str:
+    """Получить информацию о предыдущей анкете"""
     redis_r = connect
     try:
         current_persons = [json.loads(i) for i in redis_r.lrange(f'search_{id_user}', 0, -1)]
@@ -126,3 +136,20 @@ def redis_browsing_history(id_user: int, connect: redis.StrictRedis = redis_conn
     people = '\n'.join(f"{i}){person['message']}"
                        f"Ссылка: {person['url_profile']}\n" for i, person in enumerate(history, 1))
     return f"Ваша история просмотров последних {len(history)} записей:\n{people}"
+
+
+def redis_info_user(id_user: int,
+                    info: dict,
+                    action: str = 'save',
+                    connect: redis.StrictRedis = redis_connect()) -> None | dict:
+    """Сохраняет и изымает информацию о текущей анкете"""
+
+    key = f'info_user_vk_{id_user}'
+    if action == 'save':
+        connect.set(key, json.dumps(info))
+        connect.close()
+        return None
+    else:
+        result = json.loads(connect.get(key))
+        connect.close()
+        return result

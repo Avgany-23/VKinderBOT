@@ -22,5 +22,12 @@ def create_logger(name, level, filename):
     return logger
 
 
+# Базовые логи
 logger_base = create_logger('base_logger', logging.INFO, r'logs\logs_base.log')
+
+# Логи о критических ошибках
 logger_error = create_logger('critical_logger', logging.ERROR, r'logs\logs_error.log')
+
+# Логи о начале старта работы бота
+logger_starts_program = create_logger('starts_logger', logging.INFO, r'logs\starts_program.log')
+

@@ -3,11 +3,12 @@ import requests
 
 
 class SearchVK:
-    def __init__(self, token_api_vk):
+    def __init__(self, token_api_vk: str) -> None:
         self.basic_url = 'https://api.vk.com/method/'
         self.params = {'access_token': token_api_vk, 'v': VK_VERSION}
 
-    def get_user_vk(self, user_id):
+    def get_user_vk(self, user_id: int) -> str | dict:
+        """Функция возвращает информацию о пользователе в ВК по его user_id"""
         params = {'user_ids': user_id,
                   'fields': 'screen_name, sex, city, relation, activities, about, bdate, interests, music, activities'}
 
@@ -15,7 +16,6 @@ class SearchVK:
             response = requests.get(self.basic_url + 'users.get',
                                     params={**params, **self.params}).json()['response'][0]
         except KeyError:
-            print('ЛОГ - Токен недоступен')
             return 'Токен недоступен. Слишком много запросов или нужно заново авторизоваться'
         city = response.pop('city', {'title': 'не установлен', 'id': 0})
         id_user = response.pop('id')
@@ -41,7 +41,7 @@ class SearchVK:
             return response.json().get('error').get('error_msg')
         return response.json()['response']['items']
 
-    def get_photo_user(self, user_id, place='profile', max_count=5):
+    def get_photo_user(self, user_id: int, place='profile', max_count: int = 5) -> dict | int:
         """place in ('profile', 'wall')"""
         params = {'owner_id': user_id,
                   'album_id': place,

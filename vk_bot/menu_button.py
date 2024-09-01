@@ -94,37 +94,44 @@ def search_inline(url_profile: str, id_vk: int, user_list_id: int, prev_none: bo
     # --- Проверка на наличие человека в списке Избранного/ЧС для выбора подходящей кнопки ---
     session = session_bd(PATH)
     with session() as sess:
-        check_lists_result = (sess.query(Users.id_vk, LikedList.id_like_user, BlackList.id_ignore_user).
-                              join(BlackList, Users.id_vk == BlackList.id_user).
-                              outerjoin(LikedList, Users.id_vk == LikedList.id_user).
-                              filter(Users.id_vk == id_vk)).all()
-        button_liked_list = True
-        button_black_list = True
-        if check_lists_result:
-            button_liked_list = not any(user_list_id == id_[1] for id_ in check_lists_result)
-            button_black_list = not any(user_list_id == id_[2] for id_ in check_lists_result)
+        from sqlalchemy import and_
+        check_lists_result = (sess.query(Users.id_vk,
+                                         LikedList.id_like_user,
+                                         BlackList.id_ignore_user,
+                                         LikedList.name_user,
+                                         BlackList.name_user).
+                              outerjoin(LikedList, and_(Users.id_vk == LikedList.id_user,
+                                                        LikedList.id_like_user == user_list_id)).
+                              outerjoin(BlackList, and_(Users.id_vk == BlackList.id_user,
+                                                        BlackList.id_ignore_user == user_list_id)).
+                              filter(Users.id_vk == id_vk)).all()[0]
+
+        # Если True, значит кнопка "Больше не показывать", False - "Убрать из игнорируемых"
+        button_liked_list = check_lists_result[1] is None
+        # Если True, значит кнопка "Сохранить в список", False - "Удалить из списка"
+        button_black_list = check_lists_result[2] is None
 
     if button_black_list:
         keyboard.add_callback_button(label='❌Больше не показывать',
                                      color=VkKeyboardColor.NEGATIVE,
                                      payload={"type": "show_snackbar",
-                                              "text": "Пользователь добавлен в черный список"})
+                                              "text": f"Пользователь добавлен в черный список 1111"})
     else:
         keyboard.add_callback_button(label='❌Убрать из игнорируемых',
                                      color=VkKeyboardColor.NEGATIVE,
                                      payload={"type": "show_snackbar",
-                                              "text": "Пользователь удален из черного списка"})
+                                              "text": f"Пользователь удален из черного списка"})
 
     if button_liked_list:
         keyboard.add_callback_button(label='💛Сохранить в список',
                                      color=VkKeyboardColor.POSITIVE,
                                      payload={"type": "show_snackbar",
-                                              "text": "Пользователь добавлен в список избранного"})
+                                              "text": f"Пользователь добавлен в список избранного"})
     else:
         keyboard.add_callback_button(label='💛Удалить из списка',
                                      color=VkKeyboardColor.POSITIVE,
                                      payload={"type": "show_snackbar",
-                                              "text": "Пользователь удален из списка избранного"})
+                                              "text": f"Пользователь удален из списка избранного"})
     keyboard.add_line()
     keyboard.add_callback_button(label='Ссылка на профиль',
                                  color=VkKeyboardColor.SECONDARY,

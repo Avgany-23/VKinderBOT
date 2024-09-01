@@ -57,11 +57,11 @@ class TestFiltersFunc(unittest.TestCase):
             (13, 19, 2005)
         ], 1):
             with self.subTest(i):
-                error = TypeError
                 if i <= 4:
-                    error = ValueError
-                with self.assertRaises(error):
-                    calculate_age(birthday)
+                    self.assertEqual(calculate_age(birthday), 'возраст не определён')
+                else:
+                    with self.assertRaises(TypeError):
+                        calculate_age(birthday)
 
     def test_filter_age(self):
         for i, (birthday, expected) in enumerate(
@@ -73,10 +73,11 @@ class TestFiltersFunc(unittest.TestCase):
             ], 1
         ):
             with self.subTest(i):
+                result = filter_age(birthday)
                 if i <= 3:
-                    self.assertEqual(filter_age(birthday), expected)
+                    self.assertEqual(result, expected, f'Ожидалось {result}, получено {expected}')
                 else:
-                    self.assertNotEqual(filter_age(birthday), expected)
+                    self.assertNotEqual(result, expected, f'Ожидалось {result}, получено {expected}')
 
     def test_format_for_filters_users(self):
         for i, (info, expected) in enumerate([

@@ -1,6 +1,6 @@
 from database.requests_redis import redis_clear_user_id, redis_set_person, redis_set_current_person, \
     redis_save_history, redis_browsing_history, redis_person_is_current, redis_get_next_person, redis_get_person_info, \
-    redis_get_prev_person
+    redis_get_prev_person, redis_get_person_current_info
 from vk_bot.bot_function import get_message_search, save_search_people, send_message, list_users, change_filter_age, \
     change_filter_sex, change_filter_status, change_filter_city, snow_snackbar, user_filters
 from vk_bot.utils import decorator_check_users_or_create_him, message_status, message_city
@@ -10,16 +10,20 @@ from database.crud_db.search_people import SearchPeopleBd
 from settings import TOKEN_BOT, GROUP_ID_VK, HISTORY_SIZE
 from database.crud_db.black_list import BlackListBD
 from database.crud_db.liked_list import LikedListBD
+from logs.logs import logger_starts_program
 from vk_api import VkApi
 import json
 import re
 
 
 def vk_bot_main():
+    """Функция для запуска vk_bot, repeat - True, значит бот перезапущен, False - первый запуск (для логов)"""
+
     vk = VkApi(token=TOKEN_BOT)
     vk_ = vk.get_api()
     long_poll = VkBotLongPoll(vk, GROUP_ID_VK)
     print('VK bot is working...')
+    logger_starts_program.info('VK bot запущен')
 
     for event in long_poll.listen():
 
@@ -134,6 +138,7 @@ def vk_bot_main():
 
                 # ------ Если текст всплывающего сообщения содержит слово "удален" или "добавлен" ------
                 if 'удален' in mess_payload or 'добавлен' in mess_payload:
+                    info_user = redis_get_person_current_info(id_user)
                     name_user = info_user['message'][info_user['message'].find(':') + 2:info_user['message'].find('\n')]
                     if mess_payload.find('черный список') > 0:                              # Добавление в BlackList
                         BlackListBD().add_user_black_list(id_user,
@@ -175,7 +180,6 @@ def vk_bot_main():
                 else:
                     info_user = redis_get_next_person(id_user)               # Информация об анкете
                     redis_set_current_person(id_user, info_user['id_user'])  # Установить текущую просматриваемую анкету
-
                 # Предыдущая анкета изменяется на новую анкету с текущими данными
                 vk_.messages.edit(
                     peer_id=event.obj.peer_id,
