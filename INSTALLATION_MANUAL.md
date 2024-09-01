@@ -1,3 +1,9 @@
-# Contributor Covenant Code of Conduct
+# Инструкция по установке.
 
-11111
+1) скачать проект
+
+2) установка зависимостей
+
+   > pip install -r requirements.txt
+
+3) 
