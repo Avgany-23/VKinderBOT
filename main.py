@@ -51,5 +51,4 @@ def vk_bot_main_recursive() -> Union[None, 'vk_bot_main_recursive']:
                            f'Конкретная причина ошибки:\n{e}')
     vk_bot_main_recursive()
 
-vk_bot_main()
-# vk_bot_main_recursive()
+vk_bot_main_recursive()
