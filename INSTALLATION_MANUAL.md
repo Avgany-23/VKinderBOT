@@ -2,6 +2,11 @@
 
 1) **скачать проект**
 
+Чтобы не было лишних проблем, лучше сразу же отметить главную директорию как "корневую"
+
+![image](https://github.com/user-attachments/assets/477abdd9-22cd-4514-b269-aaa980b8d372)
+
+
 2) **установка зависимостей**:
 
    > pip install -r requirements.txt
