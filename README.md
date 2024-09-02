@@ -12,7 +12,7 @@
 --при вводе слова "меню" бот открывает нижнюю панель клавиш
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/261d9551-1036-4b54-a83b-ce6a60368415">
+  <img src="https://github.com/user-attachments/assets/76ca284c-a242-48e1-b82e-5c36d4d4ea54">
 </p>
 
 - "Ваши отметки" - бот покажет количество человек, который добавили вас к себе в личный список, используя этот же бот
