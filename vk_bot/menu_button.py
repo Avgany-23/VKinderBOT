@@ -115,7 +115,7 @@ def search_inline(url_profile: str, id_vk: int, user_list_id: int, prev_none: bo
         keyboard.add_callback_button(label='❌Больше не показывать',
                                      color=VkKeyboardColor.NEGATIVE,
                                      payload={"type": "show_snackbar",
-                                              "text": f"Пользователь добавлен в черный список 1111"})
+                                              "text": f"Пользователь добавлен в черный список"})
     else:
         keyboard.add_callback_button(label='❌Убрать из игнорируемых',
                                      color=VkKeyboardColor.NEGATIVE,
