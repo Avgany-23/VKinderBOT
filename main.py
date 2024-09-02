@@ -37,13 +37,13 @@ def vk_bot_main_recursive() -> Union[None, 'vk_bot_main_recursive']:
     try:
         vk_bot_main()
 
-    except vk_api.ApiError:
-        logger_error.error('Что-то пошло не так. Вероятно, слетел токен от ВК бота/неверно указан id токена/'
-                           'неверно указано id группы vk. VK bot остановлен.\n ')
+    except vk_api.ApiError as e:
+        logger_error.error(f'Что-то пошло не так. Вероятно, слетел токен от ВК бота/неверно указан id токена/'
+                           f'неверно указано id группы vk. VK bot остановлен.\n {e}')
         return None
 
-    except redis.exceptions.ConnectionError:
-        logger_error.error('Не удалось подключиться к редису. VK bot остановлен.\n ')
+    except redis.exceptions.ConnectionError as e:
+        logger_error.error(f'Не удалось подключиться к редису. VK bot остановлен.\n {e}')
         return None
 
     except BaseException as e:
