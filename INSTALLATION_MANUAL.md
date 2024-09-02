@@ -52,6 +52,10 @@
 ```
 https://oauth.vk.com/authorize?client_id=ВАШЕ_ID&display=page&redirect_uri=https://example.com/callback&scope=friends,photos&response_type=token&v=5.131&state=123456
 ```
+или с параметром offline=True на конце ссылки для **бессрочного действия токена**
+```
+https://oauth.vk.com/authorize?client_id=ВАШЕ_ID&display=page&redirect_uri=https://example.com/callback&scope=friends,photos&response_type=token&v=5.131&state=123456&offline=True
+```
 За место "ВАШЕ_ID" должно стоять ID созданного ВК приложения. После необходимо перейти по этой ссылку, подтвердить вход 
 - после вас перекинет на другой адрес. Из это адреса (ссылки вверху браузера)  нужно скопировать access_token. Это весь набор символов от access_token= до &expires_in. Полученные данные необходимо вставить в vk_api_key в файле .env проекта
 
