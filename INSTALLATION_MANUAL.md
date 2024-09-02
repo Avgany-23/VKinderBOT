@@ -18,7 +18,7 @@
 >Получение ВК токенов и настройка ВК бота описана ниже в файле.
 
 4) Настройка postgreSQL и Redis:
-   - установка редиса - [ссылка](https://habr.com/ru/articles/821363/)
+   - установка Redis - [ссылка](https://habr.com/ru/articles/821363/)
    - установка PostgreSQL - [ссылка](https://tproger.ru/articles/osnovy-postgresql-dlya-nachinayushhih--ot-ustanovki-do-pervyh-zaprosov-250851)
 
 Далее необходимо ввести данные в настройки (модуль settings.py в главной директории проекта):
