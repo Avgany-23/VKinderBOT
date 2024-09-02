@@ -2,7 +2,7 @@
 
 ## Стек технологий: Python 3.11 (SQLalchemy ORM, VkApi, telebot, threading, unittest), PostgreSQL, Redis
 
-> ### _[Установка проекти и его настройки](./INSTALLATION_MANUAL.md)_
+> ### _[Установка проекта и его настройки](./INSTALLATION_MANUAL.md)_
 > ### _[Техническая документация](./CodeDocumentation.md)_
 
 ----
