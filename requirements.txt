@@ -1,8 +1,6 @@
 asgiref==3.8.1
 certifi==2024.7.4
 charset-normalizer==3.3.2
-Django==5.1
-django-scheduler==0.10.1
 greenlet==3.0.3
 icalendar==5.0.13
 idna==3.7
@@ -13,8 +11,8 @@ python-dotenv==1.0.1
 pytz==2024.1
 redis==5.0.8
 requests==2.32.3
-schedule==1.2.2
 six==1.16.0
+schedule==1.2.2
 SQLAlchemy==2.0.32
 sqlparse==0.5.1
 telebot==0.0.5
